@@ -136,7 +136,7 @@ const path = require('path');
 const generateCertificate = async (domain, email) => {
  
 
-    const ackey = await acme.forge.createPrivateKey(2048);
+    const ackey = await acme.forge.createPrivateKey();
 
     const client = new acme.Client({
         directoryUrl:acme.directory.letsencrypt.production,
