@@ -1,4 +1,4 @@
-const generateCertificate = require("../utils/generateCertificate")
+const {generateCertificate,verifyChallengeAndGetCertificate} = require("../utils/generateCertificate")
 
 const certificate = async (req, res) =>{
     const {domain, email} = req.body
@@ -11,15 +11,43 @@ const certificate = async (req, res) =>{
 
     console.log(`Generating certificate for ${domain}`)
     try{
-        const certificateData = await generateCertificate(domain, email);
+        const { files, challenges, order, privateKey, csr }= await generateCertificate(domain, email);
+        req.app.set('challenges', challenges);
+        req.app.set('order', order);
+        req.app.set('privateKey', privateKey);
+        req.app.set('csr', csr);
+        req.app.set('accountKey', accountKey);
+
         console.log(`Sending certificate to the frontend`)
-        res.json({cert:certificateData});
+        res.json({ files, verificationLinks: files.map(file => `http://${domain}/.well-known/acme-challenge/${file.token}`) });
     }catch(err){
         console.log(`Error generating certificate`, err)
         res.json({error:"Failed to generate certificate"})
     }
 } 
 
+const verifyDomain = async (req, res) => {
+    const { domain } = req.body;
+    const challenges = req.app.get('challenges');
+    const order = req.app.get('order');
+    const privateKey = req.app.get('privateKey');
+    const csr = req.app.get('csr');
+    req.app.set('accountKey', accountKey);
+    
+    if (!challenges || !order || !privateKey || !csr) {
+        return res.status(400).json({ error: "No challenge found for domain verification" });
+    }
+
+    try {
+        const cert = await verifyChallengeAndGetCertificate(domain, challenges, order, privateKey, csr);
+        res.json({ message: "Domain verified and SSL Certificate generated successfully", certificate: cert });
+    } catch (err) {
+        console.log(`Error verifying domain`, err);
+        res.json({ error: "Failed to verify domain" });
+    }
+};
+
 module.exports = {
-    certificate
+    certificate, 
+    verifyDomain
 }
