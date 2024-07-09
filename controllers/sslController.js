@@ -35,12 +35,14 @@ const verifyDomain = async (req, res) => {
     const accountKey= req.app.get('accountKey');
 
     if (!challenges || !order || !privateKey || !csr) {
+        console.log('Missing required verification data');
         return res.status(400).json({ error: "No challenge found for domain verification" });
     }
 
     console.log(`Sending verification request`)
     try {
-        const cert = await verifyChallengeAndGetCertificate(domain, challenges, order, accountKey, csr);
+        const cert = await verifyChallengeAndGetCertificate(domain,challenges, order, accountKey, csr);
+        console.log("Domain verified and SSL Certificate generated successfully")
         res.json({ message: "Domain verified and SSL Certificate generated successfully", certificate: cert });
     } catch (err) {
         console.log(`Error verifying domain`, err);

@@ -175,13 +175,14 @@ const generateCertificate = async (domain, email) => {
     };
 };
 
-const verifyChallengeAndGetCertificate = async (domain, challenges, order, accountKey, csr) => {
+const verifyChallengeAndGetCertificate = async (domain,challenges, order, accountKey, csr) => {
     const client = new acme.Client({
         directoryUrl: acme.directory.letsencrypt.production,
         accountKey
     });
 
     for (const challenge of challenges) {
+        console.log(`Verifying challenge for domain: ${domain}, challenge: ${JSON.stringify(challenge)}`);
         await client.verifyChallenge(order, challenge);
         await client.completeChallenge(challenge);
     }
