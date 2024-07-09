@@ -157,9 +157,12 @@ const generateCertificate = async (domain, email) => {
     const authorizations = await client.getAuthorizations(order);
     const challenges = authorizations.map(auth => auth.challenges.find(ch => ch.type === 'http-01'));
 
-    const files = challenges.map(challenge => ({
-        token: challenge.token,
-        keyAuthorization: client.getChallengeKeyAuthorization(challenge)
+    const files = await Promise.all(challenges.map(async challenge => {
+        const keyAuthorization = await client.getChallengeKeyAuthorization(challenge);
+        return {
+            token: challenge.token,
+            keyAuthorization
+        };
     }));
 
     return {
