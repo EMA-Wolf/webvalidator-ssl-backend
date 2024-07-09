@@ -32,7 +32,7 @@ const verifyDomain = async (req, res) => {
     const order = req.app.get('order');
     const privateKey = req.app.get('privateKey');
     const csr = req.app.get('csr');
-    req.app.set('accountKey', accountKey);
+    // const accountKey= req.app.get('accountKey');
 
     if (!challenges || !order || !privateKey || !csr) {
         return res.status(400).json({ error: "No challenge found for domain verification" });
