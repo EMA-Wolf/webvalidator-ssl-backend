@@ -19,7 +19,8 @@ const certificate = async (req, res) =>{
         req.app.set('accountKey', accountKey);
 
         console.log(`Sending certificate to the frontend`)
-        res.json({ files, verificationLinks: files.map(file => `http://${domain}/.well-known/acme-challenge/${file.token}`) });
+        // res.json({ files, verificationLinks: files.map(file => `http://${domain}/.well-known/acme-challenge/${file.token}`) });
+        res.json({ files });
     }catch(err){
         console.log(`Error generating certificate`, err)
         res.json({error:"Failed to generate certificate"})
@@ -43,7 +44,7 @@ const verifyDomain = async (req, res) => {
     try {
         const cert = await verifyChallengeAndGetCertificate(domain,challenges, order, accountKey, csr);
         console.log("Domain verified and SSL Certificate generated successfully")
-        res.json({ message: "Domain verified and SSL Certificate generated successfully", certificate: cert });
+        res.json({ message: "Domain verified and SSL Certificate generated successfully", privateKey, certificate: cert });
     } catch (err) {
         console.log(`Error verifying domain`, err);
         res.json({ error: "Failed to verify domain" });
