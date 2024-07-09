@@ -11,7 +11,7 @@ const certificate = async (req, res) =>{
 
     console.log(`Generating certificate for ${domain}`)
     try{
-        const { files, challenges, order, privateKey, csr }= await generateCertificate(domain, email);
+        const { files, challenges, order, privateKey, csr,accountKey }= await generateCertificate(domain, email);
         req.app.set('challenges', challenges);
         req.app.set('order', order);
         req.app.set('privateKey', privateKey);
@@ -33,7 +33,7 @@ const verifyDomain = async (req, res) => {
     const privateKey = req.app.get('privateKey');
     const csr = req.app.get('csr');
     req.app.set('accountKey', accountKey);
-    
+
     if (!challenges || !order || !privateKey || !csr) {
         return res.status(400).json({ error: "No challenge found for domain verification" });
     }

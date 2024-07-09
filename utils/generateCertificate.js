@@ -167,7 +167,8 @@ const generateCertificate = async (domain, email) => {
         csr: csr.toString(),
         files,
         challenges,
-        order
+        order,
+        accountKey:ackey
     };
 };
 
