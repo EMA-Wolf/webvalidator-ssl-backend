@@ -1,12 +1,5 @@
 const acme = require('acme-client');
-const Greenlock = require("greenlock-store-fs")
 
-const greenlock = Greenlock.create({
-    packageRoot: __dirname,
-    configDir: "./greenlock.d",
-    maintainerEmail: "cccsgroupone@gmail.com",
-    cluster: false
-});
 
 // const fs = require('fs');
 // const path = require('path');
@@ -203,32 +196,61 @@ const greenlock = Greenlock.create({
 //     return cert.toString();
 // };
 
+const generateCertificate = async(domain,email) =>{
+    const client = new acme.Client({
+        directoryUrl: acme.directory.letsencrypt.production, // Use staging for testing, change to production for real certificates
+        accountKey: await acme.forge.createPrivateKey()
+    });
 
+    await client.createAccount({
+        termsOfServiceAgreed: true,
+        contact: [`mailto:${email}`]
+    });
 
-const generateCertificate = async (domain, email)=>{
-    const order = await greenlock.create({
-        domains:[domain],
-        email:email,
-        agreeToTerms: true
-    })
+    const order = await client.createOrder({
+        identifiers: [{ type: 'dns', value: domain }]
+    });
 
-    const challenges = order.challenges;
+    const [authorization] = await client.getAuthorizations(order);
 
-    //Generate private key and csr
-    const privateKey = greenlock.createPrivateKey()
-    const csr = greenlock.createCSR({domains:[domain], email})
+    const httpChallenge = authorization.challenges.find(chal => chal.type === 'http-01');
 
-    return {challenges, order, privateKey, csr}
-}
-
-const verifyChallengeAndGetCertificate = async (challenges,order,csr) => {
-    for(const challenge in challenges){
-        await greenlock.completeChanllenge(challenge)
+    const challengeDir = path.join(__dirname, 'ssl', '.well-known', 'acme-challenge');
+    if (!fs.existsSync(challengeDir)) {
+        fs.mkdirSync(challengeDir, { recursive: true });
     }
 
-    const certificate = await greenlock.finalizeOrder(order,csr)
+    const challengeFilePath = path.join(challengeDir, httpChallenge.token);
+    fs.writeFileSync(challengeFilePath, httpChallenge.keyAuthorization);
 
-    return certificate
+    return {
+        order,
+        authorization,
+        httpChallenge,
+        key: await acme.forge.createPrivateKey(),
+        csr: await acme.forge.createCsr({
+            commonName: domain
+        })
+    };
+}
+
+
+const verifyChallengeAndGetCertificate = async ({ order, authorization, httpChallenge, key, csr })=>{
+    const client = new acme.Client({
+        directoryUrl: acme.directory.letsencrypt.production,
+        accountKey: await acme.forge.createPrivateKey()
+    });
+
+    await client.verifyChallenge(authorization, httpChallenge);
+    await client.completeChallenge(httpChallenge);
+    await client.waitForValidOrder(order);
+
+    const certificate = await client.finalizeOrder(order, csr);
+
+    return {
+        privateKey: key.toString(),
+        certificate: certificate.cert
+    };
 }
 
 module.exports = {
