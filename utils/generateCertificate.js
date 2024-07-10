@@ -1,8 +1,6 @@
 const acme = require('acme-client');
-
-
-// const fs = require('fs');
-// const path = require('path');
+const fs = require('fs');
+const path = require('path');
 
 // const generateCertificate = async (domain, email) => {
 //     const accountKey = await acme.forge.createPrivateKey();

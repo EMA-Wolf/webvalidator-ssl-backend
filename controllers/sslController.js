@@ -54,6 +54,7 @@ const {generateCertificate,verifyChallengeAndGetCertificate} = require("../utils
 
 const certificate = async(req,res)=>{
     const { domain, email } = req.body;
+    console.log(`Domain recieved:${domain}, email received:${email}`)
 
     if (!domain || !email) {
         console.log('Domain and email are required')
