@@ -212,6 +212,7 @@ const generateCertificate = async(domain,email) =>{
     const [authorization] = await client.getAuthorizations(order);
 
     const httpChallenge = authorization.challenges.find(chal => chal.type === 'http-01');
+    const key = await client.getChallengeKeyAuthorization(httpChallenge)
     console.log("httpChallenge:",httpChallenge)
 
     const challengeDir = path.join(__dirname, 'ssl', '.well-known', 'acme-challenge');
@@ -233,7 +234,7 @@ const generateCertificate = async(domain,email) =>{
         order,
         authorization,
         httpChallenge,
-        key: await acme.forge.createPrivateKey(),
+        key: key,
         csr: await acme.forge.createCsr({
             commonName: domain
         })
