@@ -78,6 +78,8 @@ const certificate = async(req,res)=>{
 const verifyDomain = async(req,res) =>{
     const { challengeData } = req.body;
 
+    console.log('Challengedata',challengeData)
+    
     if (!challengeData) {
         console.log('Challenge data is required')
         return res.status(400).json({ error: 'Challenge data is required' });
