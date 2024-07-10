@@ -219,6 +219,13 @@ const generateCertificate = async(domain,email) =>{
     }
 
     const challengeFilePath = path.join(challengeDir, httpChallenge.token);
+
+    console.log('challengeFilePath:', challengeFilePath); // Debugging line
+    console.log('typeof challengeFilePath:', typeof challengeFilePath); // Debugging line
+    console.log('httpChallenge.keyAuthorization:', httpChallenge.keyAuthorization); // Debugging line
+    console.log('typeof httpChallenge.keyAuthorization:', typeof httpChallenge.keyAuthorization); // Debugging line
+
+
     fs.writeFileSync(challengeFilePath, httpChallenge.keyAuthorization);
 
     return {
