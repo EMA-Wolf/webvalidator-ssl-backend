@@ -64,7 +64,7 @@ const certificate = async(req,res)=>{
 
     try {
         const challengeData = await generateCertificate(domain, email);
-        console.log('Challenge file generated, sending reponse to frontend')
+        console.log('Challenge file generated, sending reponse to frontend',challengeData)
         res.json({
             message: 'Challenge file generated. Please download and place it in your website’s .well-known/acme-challenge directory.',
             challengeData
