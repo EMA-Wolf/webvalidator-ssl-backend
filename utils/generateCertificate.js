@@ -1,4 +1,13 @@
 const acme = require('acme-client');
+const Greenlock = require("greenlock-store-fs")
+
+const greenlock = Greenlock.create({
+    packageRoot: __dirname,
+    configDir: "./greenlock.d",
+    maintainerEmail: "cccsgroupone@gmail.com",
+    cluster: false
+});
+
 // const fs = require('fs');
 // const path = require('path');
 
@@ -133,66 +142,94 @@ const acme = require('acme-client');
 //     };
 // };
 
-const generateCertificate = async (domain, email) => {
+// const generateCertificate = async (domain, email) => {
  
 
-    const ackey = await acme.forge.createPrivateKey();
+//     const ackey = await acme.forge.createPrivateKey();
 
-    const client = new acme.Client({
-        directoryUrl:acme.directory.letsencrypt.production,
-        accountKey:ackey
-    });
+//     const client = new acme.Client({
+//         directoryUrl:acme.directory.letsencrypt.production,
+//         accountKey:ackey
+//     });
 
-       // Registering account
-     await client.createAccount({
-        termsOfServiceAgreed: true,
-        contact: [`mailto:${email}`]
-    });
+//        // Registering account
+//      await client.createAccount({
+//         termsOfServiceAgreed: true,
+//         contact: [`mailto:${email}`]
+//     });
 
-    const [key, csr] = await acme.forge.createCsr({
-        commonName: domain 
-    });
+//     const [key, csr] = await acme.forge.createCsr({
+//         commonName: domain 
+//     });
 
-    const order = await client.createOrder({ identifiers: [{ type: 'dns', value: domain }] });
-    const authorizations = await client.getAuthorizations(order);
-    const challenges = authorizations.map(auth => auth.challenges.find(ch => ch.type === 'http-01'));
+//     const order = await client.createOrder({ identifiers: [{ type: 'dns', value: domain }] });
+//     const authorizations = await client.getAuthorizations(order);
+//     const challenges = authorizations.map(auth => auth.challenges.find(ch => ch.type === 'http-01'));
 
-    const files = await Promise.all(challenges.map(async challenge => {
-        const keyAuthorization = await client.getChallengeKeyAuthorization(challenge);
-        return {
-            token: challenge.token,
-            keyAuthorization
-        };
-    }));
+//     const files = await Promise.all(challenges.map(async challenge => {
+//         const keyAuthorization = await client.getChallengeKeyAuthorization(challenge);
+//         return {
+//             token: challenge.token,
+//             keyAuthorization
+//         };
+//     }));
 
-    return {
-        privateKey: key.toString(),
-        csr: csr.toString(),
-        files,
-        challenges,
-        order,
-        accountKey:ackey
-    };
-};
+//     return {
+//         privateKey: key.toString(),
+//         csr: csr.toString(),
+//         files,
+//         challenges,
+//         order,
+//         accountKey:ackey
+//     };
+// };
 
-const verifyChallengeAndGetCertificate = async (domain,challenges, order, accountKey, csr) => {
-    const client = new acme.Client({
-        directoryUrl: acme.directory.letsencrypt.production,
-        accountKey
-    });
+// const verifyChallengeAndGetCertificate = async (domain,challenges, order, accountKey, csr) => {
+//     const client = new acme.Client({
+//         directoryUrl: acme.directory.letsencrypt.production,
+//         accountKey
+//     });
 
-    for (const challenge of challenges) {
-        console.log(`Verifying challenge for domain: ${domain}, challenge: ${JSON.stringify(challenge)}`);
-        await client.verifyChallenge(order, challenge);
-        await client.completeChallenge(challenge);
+//     for (const challenge of challenges) {
+//         console.log(`Verifying challenge for domain: ${domain}, challenge: ${JSON.stringify(challenge)}`);
+//         await client.verifyChallenge(order, challenge);
+//         await client.completeChallenge(challenge);
+//     }
+
+//     await client.waitForValidStatus(order);
+
+//     const cert = await client.finalizeOrder(order, csr);
+
+//     return cert.toString();
+// };
+
+
+
+const generateCertificate = async (domain, email)=>{
+    const order = await greenlock.create({
+        domains:[domain],
+        email:email,
+        agreeToTerms: true
+    })
+
+    const challenges = order.challenges;
+
+    //Generate private key and csr
+    const privateKey = greenlock.createPrivateKey()
+    const csr = greenlock.createCSR({domains:[domain], email})
+
+    return {challenges, order, privateKey, csr}
+}
+
+const verifyChallengeAndGetCertificate = async (challenges,order,csr) => {
+    for(const challenge in challenges){
+        await greenlock.completeChanllenge(challenge)
     }
 
-    await client.waitForValidStatus(order);
+    const certificate = await greenlock.finalizeOrder(order,csr)
 
-    const cert = await client.finalizeOrder(order, csr);
-
-    return cert.toString();
-};
+    return certificate
+}
 
 module.exports = {
     generateCertificate,
