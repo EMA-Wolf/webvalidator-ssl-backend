@@ -212,6 +212,7 @@ const generateCertificate = async(domain,email) =>{
     const [authorization] = await client.getAuthorizations(order);
 
     const httpChallenge = authorization.challenges.find(chal => chal.type === 'http-01');
+    console.log("httpChallenge:",httpChallenge)
 
     const challengeDir = path.join(__dirname, 'ssl', '.well-known', 'acme-challenge');
     if (!fs.existsSync(challengeDir)) {
