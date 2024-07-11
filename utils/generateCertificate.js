@@ -250,9 +250,10 @@ const verifyChallengeAndGetCertificate = async ({ order, authorization, httpChal
 
     await client.verifyChallenge(authorization, httpChallenge);
     await client.completeChallenge(httpChallenge);
-    await client.waitForValidOrder(order);
+    await client.waitForValidStatus(order);
+    await client.finalizeOrder(order, csr)
 
-    const certificate = await client.finalizeOrder(order, csr);
+    const certificate = await client.getCertificate(order) ;
 
     return {
         privateKey: key.toString(),
