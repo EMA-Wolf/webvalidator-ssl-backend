@@ -212,7 +212,7 @@ const generateCertificate = async(domain,email) =>{
     const [authorization] = await client.getAuthorizations(order);
 
     const httpChallenge = authorization.challenges.find(chal => chal.type === 'http-01');
-    const key = await client.getChallengeKeyAuthorization(httpChallenge)
+    const keyAuthorization = await client.getChallengeKeyAuthorization(httpChallenge)
     console.log("httpChallenge:",httpChallenge)
 
     const challengeDir = path.join(__dirname, 'ssl', '.well-known', 'acme-challenge');
@@ -233,7 +233,7 @@ const generateCertificate = async(domain,email) =>{
         order,
         authorization,
         httpChallenge,
-        key: key,
+        keyAuthorization,
         csr: await acme.forge.createCsr({
             commonName: domain
         })
@@ -241,7 +241,7 @@ const generateCertificate = async(domain,email) =>{
 }
 
 
-const verifyChallengeAndGetCertificate = async ({ order, authorization, httpChallenge, key, csr })=>{
+const verifyChallengeAndGetCertificate = async ({ order, authorization, httpChallenge, keyAuthorization, csr })=>{
     const client = new acme.Client({
         directoryUrl: acme.directory.letsencrypt.staging,
         accountKey: await acme.forge.createPrivateKey()
@@ -255,7 +255,7 @@ const verifyChallengeAndGetCertificate = async ({ order, authorization, httpChal
     const certificate = await client.getCertificate(order) ;
 
     return {
-        privateKey: key.toString(),
+        privateKey: keyAuthorization.toString(),
         certificate: certificate.cert
     };
 }
