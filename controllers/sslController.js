@@ -1,4 +1,4 @@
-const {generateCertificate} = require("../utils/generateCertificate")
+const {generateCertificate,verifyChallengeAndGetCertificate} = require("../utils/generateCertificate")
 
 // const certificate = async (req, res) =>{
 //     const {domain, email} = req.body
@@ -75,29 +75,29 @@ const certificate = async(req,res)=>{
     }
 }
 
-// const verifyDomain = async(req,res) =>{
-//     const { challengeData } = req.body;
+const verifyDomain = async(req,res) =>{
+    const { challengeData } = req.body;
 
-//     console.log('Verifying Challengedata',challengeData)
+    console.log('Verifyying Challengedata',challengeData)
 
-//     if (!challengeData) {
-//         console.log('Challenge data is required')
-//         return res.status(400).json({ error: 'Challenge data is required' });
-//     }
+    if (!challengeData) {
+        console.log('Challenge data is required')
+        return res.status(400).json({ error: 'Challenge data is required' });
+    }
 
-//     console.log(`testing verification process`)
-//     try {
-//         const sslCertificate = await  verifyChallengeAndGetCertificate(challengeData);
-//         console.log(`verification success`)
-//         res.json({sslCertificate});
-//     } catch (error) {
-//         console.error('Error verifying SSL certificate:', error);
-//         res.status(500).json({ error: 'Failed to verify SSL certificate' });
-//     }
-// }
+    console.log(`testing verification process`)
+    try {
+        const sslCertificate = await  verifyChallengeAndGetCertificate(challengeData);
+        console.log(`verification success`)
+        res.json({sslCertificate});
+    } catch (error) {
+        console.error('Error verifying SSL certificate:', error);
+        res.status(500).json({ error: 'Failed to verify SSL certificate' });
+    }
+}
 
 
 module.exports = {
     certificate, 
-    // verifyDomain
+    verifyDomain
 }
