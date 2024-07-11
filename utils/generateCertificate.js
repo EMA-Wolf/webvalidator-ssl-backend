@@ -330,5 +330,5 @@ const generateCertificate = async (domain, email) => {
 
 module.exports = {
     generateCertificate,
-    verifyChallengeAndGetCertificate
+    // verifyChallengeAndGetCertificate
 }
