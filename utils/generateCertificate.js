@@ -194,9 +194,100 @@ const path = require('path');
 //     return cert.toString();
 // };
 
-const generateCertificate = async(domain,email) =>{
+
+
+
+// const generateCertificate = async(domain,email) =>{
+//     const client = new acme.Client({
+//         directoryUrl: acme.directory.letsencrypt.staging, // Use staging for testing, change to production for real certificates
+//         accountKey: await acme.forge.createPrivateKey()
+//     });
+
+//     await client.createAccount({
+//         termsOfServiceAgreed: true,
+//         contact: [`mailto:${email}`]
+//     });
+
+//     const order = await client.createOrder({
+//         identifiers: [{ type: 'dns', value: domain }]
+//     });
+
+//     const [authorization] = await client.getAuthorizations(order);
+
+//     const httpChallenge = authorization.challenges.find(chal => chal.type === 'http-01');
+//     const key = await client.getChallengeKeyAuthorization(httpChallenge)
+
+//     console.log("httpChallenge:",httpChallenge)
+
+//     const challengeDir = path.join(__dirname, 'ssl', '.well-known', 'acme-challenge');
+//     if (!fs.existsSync(challengeDir)) {
+//         fs.mkdirSync(challengeDir, { recursive: true });
+//     }
+
+//     const challengeFilePath = path.join(challengeDir, httpChallenge.token);
+//     // console.log('challengeFilePath:', challengeFilePath); // Debugging line
+//     // console.log('typeof challengeFilePath:', typeof challengeFilePath); // Debugging line
+//     // console.log('httpChallenge.keyAuthorization:', httpChallenge.keyAuthorization); // Debugging line
+//     // console.log('typeof httpChallenge.keyAuthorization:', typeof httpChallenge.keyAuthorization); // Debugging line
+
+
+//     // fs.writeFileSync(challengeFilePath, httpChallenge.keyAuthorization);
+
+//     return {
+//         order,
+//         authorization,
+//         httpChallenge,
+//         key: key,
+//         csr: await acme.forge.createCsr({
+//             commonName: domain
+//         })
+//     };
+// }
+
+
+// const verifyChallengeAndGetCertificate = async ({ order, authorization, httpChallenge, key, csr })=>{
+//     const client = new acme.Client({
+//         directoryUrl: acme.directory.letsencrypt.staging,
+//         accountKey: await acme.forge.createPrivateKey()
+//     });
+
+//     await client.verifyChallenge(authorization, httpChallenge);
+//     await client.completeChallenge(httpChallenge);
+//     await client.waitForValidStatus(order);
+//     await client.finalizeOrder(order, csr)
+
+//     const certificate = await client.getCertificate(order) ;
+
+//     return {
+//         privateKey: key.toString(),
+//         certificate: certificate.cert
+//     };
+// }
+
+async function challengeCreateFn(authz, challenge, keyAuthorization) {
+    const challengeDir = path.join(__dirname, 'ssl', '.well-known', 'acme-challenge');
+    if (!fs.existsSync(challengeDir)) {
+        fs.mkdirSync(challengeDir, { recursive: true });
+    }
+
+    const challengeFilePath = path.join(challengeDir, challenge.token);
+    const challengeContent = `${challenge.token}.${keyAuthorization}`;
+
+    fs.writeFileSync(challengeFilePath, challengeContent);
+    console.log(`Challenge file created at ${challengeFilePath}`);
+}
+
+async function challengeRemoveFn(authz, challenge, keyAuthorization) {
+    const challengeFilePath = path.join(__dirname, 'ssl', '.well-known', 'acme-challenge', challenge.token);
+    if (fs.existsSync(challengeFilePath)) {
+        fs.unlinkSync(challengeFilePath);
+        console.log(`Challenge file removed from ${challengeFilePath}`);
+    }
+}
+
+const generateCertificate = async (domain, email) => {
     const client = new acme.Client({
-        directoryUrl: acme.directory.letsencrypt.production, // Use staging for testing, change to production for real certificates
+        directoryUrl: acme.directory.letsencrypt.staging,
         accountKey: await acme.forge.createPrivateKey()
     });
 
@@ -212,54 +303,30 @@ const generateCertificate = async(domain,email) =>{
     const [authorization] = await client.getAuthorizations(order);
 
     const httpChallenge = authorization.challenges.find(chal => chal.type === 'http-01');
-    const key = await client.getChallengeKeyAuthorization(httpChallenge)
-    console.log("httpChallenge:",httpChallenge)
+    const keyAuthorization = await client.getChallengeKeyAuthorization(httpChallenge);
 
-    const challengeDir = path.join(__dirname, 'ssl', '.well-known', 'acme-challenge');
-    if (!fs.existsSync(challengeDir)) {
-        fs.mkdirSync(challengeDir, { recursive: true });
+    try {
+        await challengeCreateFn(authorization, httpChallenge, keyAuthorization);
+        await client.verifyChallenge(authorization, httpChallenge);
+        await client.completeChallenge(httpChallenge);
+        await client.waitForValidStatus(httpChallenge);
+    } finally {
+        await challengeRemoveFn(authorization, httpChallenge, keyAuthorization);
     }
 
-    const challengeFilePath = path.join(challengeDir, httpChallenge.token);
-
-    // console.log('challengeFilePath:', challengeFilePath); // Debugging line
-    // console.log('typeof challengeFilePath:', typeof challengeFilePath); // Debugging line
-    // console.log('httpChallenge.keyAuthorization:', httpChallenge.keyAuthorization); // Debugging line
-    // console.log('typeof httpChallenge.keyAuthorization:', typeof httpChallenge.keyAuthorization); // Debugging line
-
-
-    // fs.writeFileSync(challengeFilePath, httpChallenge.keyAuthorization);
-
-    return {
-        order,
-        authorization,
-        httpChallenge,
-        key: key,
-        csr: await acme.forge.createCsr({
-            commonName: domain
-        })
-    };
-}
-
-
-const verifyChallengeAndGetCertificate = async ({ order, authorization, httpChallenge, key, csr })=>{
-    const client = new acme.Client({
-        directoryUrl: acme.directory.letsencrypt.production,
-        accountKey: await acme.forge.createPrivateKey()
+    const [key, csr] = await acme.forge.createCsr({
+        commonName: domain
     });
 
-    await client.verifyChallenge(authorization, httpChallenge);
-    await client.completeChallenge(httpChallenge);
-    await client.waitForValidStatus(order);
-    await client.finalizeOrder(order, csr)
-
-    const certificate = await client.getCertificate(order) ;
+    await client.finalizeOrder(order, csr);
+    const certificate = await client.getCertificate(order);
 
     return {
         privateKey: key.toString(),
-        certificate: certificate.cert
+        certificate: certificate.toString(),
+        challengeContent: `${httpChallenge.token}.${keyAuthorization}`
     };
-}
+};
 
 module.exports = {
     generateCertificate,
