@@ -1,4 +1,4 @@
-const {generateCertificate,verifyChallengeAndGetCertificate} = require("../utils/generateCertificate")
+const {generateCertificate} = require("../utils/generateCertificate")
 
 // const certificate = async (req, res) =>{
 //     const {domain, email} = req.body
