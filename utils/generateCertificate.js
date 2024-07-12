@@ -260,7 +260,7 @@ const verifyChallengeAndGetCertificate = async ({ order, authorization, httpChal
 
 
     const [key, csr] = await acme.crypto.createCsr({
-        commonNames: domain,
+        altNames:[domain],
     });
 
    const finalized = await client.finalizeOrder(order, csr)
