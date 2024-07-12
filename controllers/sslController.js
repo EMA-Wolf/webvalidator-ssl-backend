@@ -76,7 +76,7 @@ const certificate = async(req,res)=>{
 }
 
 const verifyDomain = async(req,res) =>{
-    const { challengeData } = req.body;
+    const { challengeData, domain } = req.body;
 
     console.log('Verifyying Challengedata',challengeData)
 
@@ -87,7 +87,7 @@ const verifyDomain = async(req,res) =>{
 
     console.log(`testing verification process`)
     try {
-        const sslCertificate = await  verifyChallengeAndGetCertificate(challengeData);
+        const sslCertificate = await  verifyChallengeAndGetCertificate(challengeData,domain);
         console.log(`verification success`)
         res.json({sslCertificate});
     } catch (error) {
