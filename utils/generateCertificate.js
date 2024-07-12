@@ -252,11 +252,11 @@ const generateCertificate = async(domain,email) =>{
 
 const verifyChallengeAndGetCertificate = async ({ order, authorization, httpChallenge, keyAuthorization},domain)=>{
 
-    await challengeCreateFn(authorization, httpChallenge, keyAuthorization)
+  
     await client.verifyChallenge(authorization, httpChallenge);
     await client.completeChallenge(httpChallenge);
     await client.waitForValidStatus(order);
-    await challengeRemoveFn(authorization, httpChallenge, keyAuthorization)
+  
 
 
     const [key, csr] = await acme.crypto.createCsr({
