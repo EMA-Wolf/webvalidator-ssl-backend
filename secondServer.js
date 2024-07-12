@@ -6,7 +6,7 @@ const connectDB = require("./config/db")
 const siteRoutes = require("./routes/siteRoutes")
 const authRoutes = require("./routes/authRoutes")
 const sslRoutes = require("./routes/sslRoutes")
-const ssl2Routes = require("./routes/ssl2Routes")
+
 
 require("dotenv").config() 
 
