@@ -105,6 +105,103 @@ const runSingleCheck = async (req,res) =>{
     }
 }
 
+// const runAllChecks = async (req, res) => {
+//   const userId = req.body._id;
+//   const sites = req.body.sites;
+
+//   const results = [];
+//   const errors = [];
+
+//   console.time(`Start time`)
+//   for (const site of sites) {
+//     const domain = site.name;
+//     let hasSSL = false;
+//     let isLive = false;
+//     let redirectTo = null;
+//     let hasMalware = false;
+
+//     try {
+//       console.log(`Processing domain: ${domain}`);
+  
+
+//       hasSSL = await getSslDetails(domain);
+//       const liveCheck = await checkIfLive(domain);
+//       isLive = liveCheck.isLive;
+//       redirectTo = liveCheck.redirectTo;
+
+//       request.domainLookup(domain, async (err, response) => {
+//         if (err) {
+//           console.error(`Error looking up domain ${domain} in VirusTotal:`, err);
+//           errors.push({ name: domain, status: `Error: ${err}` });
+//         } else {
+//           const list = JSON.parse(response);
+//           const analysisResults = list.data.attributes.last_analysis_results;
+
+//           for (let key in analysisResults) {
+//             if (analysisResults[key].result.includes('malware')) {
+//               hasMalware = true;
+//               break;
+//             }
+//           }
+
+//           const siteData = { name: domain, ssl: hasSSL.valid, mal: hasMalware, live: isLive, redirectTo };
+
+//           results.push(siteData);
+
+//           const user = await User.findOne({ _id: userId, "sites.name": domain });
+
+//           if (user) {
+//             console.log(`Updating ${domain} in database`);
+
+//             await User.updateOne(
+//               { _id: userId, "sites.name": domain },
+//               {
+//                 $set: {
+//                   "sites.$.hasSSL": hasSSL.valid,
+//                   "sites.$.hasMalware": hasMalware,
+//                   "sites.$.isLive": isLive,
+//                   "sites.$.redirectTo": redirectTo,
+//                 }
+//               }
+//             );
+          
+//           } else {
+//             console.log(`Adding ${domain} to database`);
+
+//             await User.updateOne(
+//               { _id: userId },
+//               { $push: { sites: { name: domain, "hasSSL": hasSSL.valid, hasMalware, isLive, redirectTo } } }
+//             );
+           
+//           }
+//         }
+
+//         if (results.length + errors.length === sites.length) {
+//           console.log(`Done, now printing results to terminal`);
+//           const response = await User.findById(userId);
+//           const resultsResponse = response.sites;
+//           delete resultsResponse.password;
+//           console.log(results);
+//           res.json({ success: resultsResponse, errors });
+//         }
+//       });
+//     } catch (err) {
+//       console.error(`Error processing domain ${domain}`, err.message);
+//       errors.push({ name: domain, status: `Error: ${err.message}` });
+
+//       if (results.length + errors.length === sites.length) {
+//         console.log(`Done, now printing results to terminal`);
+//         const response = await User.findById(userId);
+//         const resultsResponse = response.sites;
+//         delete resultsResponse.password;
+//         console.log(results);
+//         res.json({ success: resultsResponse, errors });
+//       }
+//     }
+//   }
+//   console.timeEnd(`Start time`)
+// };
+
 const runAllChecks = async (req, res) => {
   const userId = req.body._id;
   const sites = req.body.sites;
@@ -112,8 +209,10 @@ const runAllChecks = async (req, res) => {
   const results = [];
   const errors = [];
 
-  console.time(`Start time`)
-  for (const site of sites) {
+  console.time(`Start time`);
+  
+  // Use Promise.all to run all checks concurrently
+  await Promise.all(sites.map(async (site) => {
     const domain = site.name;
     let hasSSL = false;
     let isLive = false;
@@ -122,86 +221,78 @@ const runAllChecks = async (req, res) => {
 
     try {
       console.log(`Processing domain: ${domain}`);
-  
 
       hasSSL = await getSslDetails(domain);
       const liveCheck = await checkIfLive(domain);
       isLive = liveCheck.isLive;
       redirectTo = liveCheck.redirectTo;
 
-      request.domainLookup(domain, async (err, response) => {
-        if (err) {
-          console.error(`Error looking up domain ${domain} in VirusTotal:`, err);
-          errors.push({ name: domain, status: `Error: ${err}` });
-        } else {
-          const list = JSON.parse(response);
-          const analysisResults = list.data.attributes.last_analysis_results;
+      // Use promise-based request to VirusTotal
+      const response = await new Promise((resolve, reject) => {
+        request.domainLookup(domain, (err, response) => {
+          if (err) reject(err);
+          else resolve(response);
+        });
+      });
 
-          for (let key in analysisResults) {
-            if (analysisResults[key].result.includes('malware')) {
-              hasMalware = true;
-              break;
+      const list = JSON.parse(response);
+      const analysisResults = list.data.attributes.last_analysis_results;
+
+      for (let key in analysisResults) {
+        if (analysisResults[key].result.includes('malware')) {
+          hasMalware = true;
+          break;
+        }
+      }
+
+      const siteData = { name: domain, ssl: hasSSL.valid, mal: hasMalware, live: isLive, redirectTo };
+
+      results.push(siteData);
+
+      const user = await User.findOne({ _id: userId, "sites.name": domain });
+
+      if (user) {
+        console.log(`Updating ${domain} in database`);
+
+        await User.updateOne(
+          { _id: userId, "sites.name": domain },
+          {
+            $set: {
+              "sites.$.hasSSL": hasSSL.valid,
+              "sites.$.hasMalware": hasMalware,
+              "sites.$.isLive": isLive,
+              "sites.$.redirectTo": redirectTo,
             }
           }
+        );
+      } else {
+        console.log(`Adding ${domain} to database`);
 
-          const siteData = { name: domain, ssl: hasSSL.valid, mal: hasMalware, live: isLive, redirectTo };
-
-          results.push(siteData);
-
-          const user = await User.findOne({ _id: userId, "sites.name": domain });
-
-          if (user) {
-            console.log(`Updating ${domain} in database`);
-
-            await User.updateOne(
-              { _id: userId, "sites.name": domain },
-              {
-                $set: {
-                  "sites.$.hasSSL": hasSSL.valid,
-                  "sites.$.hasMalware": hasMalware,
-                  "sites.$.isLive": isLive,
-                  "sites.$.redirectTo": redirectTo,
-                }
-              }
-            );
-          
-          } else {
-            console.log(`Adding ${domain} to database`);
-
-            await User.updateOne(
-              { _id: userId },
-              { $push: { sites: { name: domain, "hasSSL": hasSSL.valid, hasMalware, isLive, redirectTo } } }
-            );
-           
-          }
-        }
-
-        if (results.length + errors.length === sites.length) {
-          console.log(`Done, now printing results to terminal`);
-          const response = await User.findById(userId);
-          const resultsResponse = response.sites;
-          delete resultsResponse.password;
-          console.log(results);
-          res.json({ success: resultsResponse, errors });
-        }
-      });
+        await User.updateOne(
+          { _id: userId },
+          { $push: { sites: { name: domain, hasSSL: hasSSL.valid, hasMalware, isLive, redirectTo } } }
+        );
+      }
     } catch (err) {
       console.error(`Error processing domain ${domain}`, err.message);
       errors.push({ name: domain, status: `Error: ${err.message}` });
-
-      if (results.length + errors.length === sites.length) {
-        console.log(`Done, now printing results to terminal`);
-        const response = await User.findById(userId);
-        const resultsResponse = response.sites;
-        delete resultsResponse.password;
-        console.log(results);
-        res.json({ success: resultsResponse, errors });
-      }
     }
-  }
-  console.timeEnd(`Start time`)
+  }));
+
+  console.log(`Done, now printing results to terminal`);
+  const response = await User.findById(userId);
+  const resultsResponse = response.sites;
+  delete resultsResponse.password;
+  console.log(results);
+
+  res.json({ success: resultsResponse, errors });
+  console.timeEnd(`Start time`);
 };
 
+
+
+
+//Delete site(s) from the database
 const deleteSite = async (req,res) =>{
   const userId = req.body._id
   const sites = req.body.sites
