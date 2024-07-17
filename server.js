@@ -4,7 +4,9 @@ const cors = require('cors')
 const bodyParser = require("body-parser")
 const sslChecker = require("ssl-checker")
 const nvt = require("node-virustotal")
-const request = nvt.makeAPI().setKey('f53dc40b7c524898860fb33d348a43fbf59e1e956dd61934d111aca2eaf5e82c');
+
+require("dotenv").config() 
+const request = nvt.makeAPI().setKey(process.env.VIRUSTOTAL_API_KEY);
 // const https = require("https")
 // const axios = require("axios")
 const axios = require("axios").create({ maxRedirects: 10 }); 
