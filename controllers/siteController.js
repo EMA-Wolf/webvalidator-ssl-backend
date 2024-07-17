@@ -16,7 +16,7 @@ const runSingleCheck = async (req,res) =>{
     // const error = []
     const error = {}
     
-    console.time(`Start time for ${domain}`)
+    console.time(`Scan time for ${domain}`)
     try{
     console.log(`Processing domain: ${domain}`);
     let hasSSL = false;
@@ -84,7 +84,7 @@ const runSingleCheck = async (req,res) =>{
             );
             
           }
-         console.timeEnd(`End time for ${domain}`)
+         console.timeEnd(`Scan time for ${domain}`)
           console.log(`Done, now printing results to terminal`)
           const databaseResponse = await User.findById(userId) 
           const resultsResponse = databaseResponse.sites
@@ -178,7 +178,6 @@ const runAllChecks = async (req, res) => {
 
         if (results.length + errors.length === sites.length) {
           console.log(`Done, now printing results to terminal`);
-          console.timeEnd(`Start time`)
           const response = await User.findById(userId);
           const resultsResponse = response.sites;
           delete resultsResponse.password;
