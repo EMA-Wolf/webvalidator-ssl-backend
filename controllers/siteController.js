@@ -16,9 +16,9 @@ const runSingleCheck = async (req,res) =>{
     // const error = []
     const error = {}
     
+    console.time(`Start time for ${domain}`)
     try{
     console.log(`Processing domain: ${domain}`);
-    console.time(`Start time for ${domain}`)
     let hasSSL = false;
     let isLive = false;
     let redirectTo;
@@ -112,6 +112,7 @@ const runAllChecks = async (req, res) => {
   const results = [];
   const errors = [];
 
+  console.time(`Start time`)
   for (const site of sites) {
     const domain = site.name;
     let hasSSL = false;
@@ -121,7 +122,7 @@ const runAllChecks = async (req, res) => {
 
     try {
       console.log(`Processing domain: ${domain}`);
-      console.time(`Start time for ${domain}`)
+  
 
       hasSSL = await getSslDetails(domain);
       const liveCheck = await checkIfLive(domain);
@@ -191,7 +192,6 @@ const runAllChecks = async (req, res) => {
 
       if (results.length + errors.length === sites.length) {
         console.log(`Done, now printing results to terminal`);
-        console.timeEnd(`End time`)
         const response = await User.findById(userId);
         const resultsResponse = response.sites;
         delete resultsResponse.password;
@@ -200,6 +200,7 @@ const runAllChecks = async (req, res) => {
       }
     }
   }
+  console.timeEnd(`End time`)
 };
 
 const deleteSite = async (req,res) =>{
