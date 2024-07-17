@@ -270,7 +270,8 @@ const runAllChecks = async (req, res) => {
 
         await User.updateOne(
           { _id: userId },
-          { $push: { sites: { name: domain, hasSSL: hasSSL.valid, hasMalware, isLive, redirectTo } } }
+          // { $push: { sites: { name: domain, hasSSL: hasSSL.valid, hasMalware, isLive, redirectTo } } }
+          { $push: { sites: siteData }  }
         );
       }
     } catch (err) {
