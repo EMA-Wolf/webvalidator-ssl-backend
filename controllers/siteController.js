@@ -267,11 +267,10 @@ const runAllChecks = async (req, res) => {
         );
       } else {
         console.log(`Adding ${domain} to database`);
-
         await User.updateOne(
           { _id: userId },
-          // { $push: { sites: { name: domain, hasSSL: hasSSL.valid, hasMalware, isLive, redirectTo } } }
-          { $push: { sites: siteData }  }
+          { $push: { sites: { name: domain, hasSSL: hasSSL.valid, hasMalware, isLive, redirectTo } } }
+          // { $push: { sites: siteData }  }
         );
       }
     } catch (err) {
