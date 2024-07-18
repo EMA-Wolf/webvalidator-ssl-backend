@@ -25,6 +25,12 @@ const sendEmail = async (to, subject, text) =>{
         to,
         subject,
         text,
+        attachments: [
+            {
+              filename: 'report.pdf',
+              path: attachmentPath,
+            },
+          ],
     }
 
     try{
