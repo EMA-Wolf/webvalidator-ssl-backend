@@ -220,6 +220,7 @@ const runAllChecks = async (req, res) => {
   const results = [];
   const errors = [];
 
+  console.log(`Full scan started by ${userName}`)
   console.time(`Start time`);
   
   // Use Promise.all to run all checks concurrently
@@ -230,7 +231,6 @@ const runAllChecks = async (req, res) => {
     let redirectTo = null;
     let hasMalware = false;
 
-    console.log(`Full scan started by ${userName}`)
     try {
       console.log(`Processing domain: ${domain}`);
 
@@ -299,8 +299,9 @@ const runAllChecks = async (req, res) => {
 
   res.json({ success: resultsResponse, errors });
   console.timeEnd(`Start time`);
-  
+
  // Generate PDF report
+ console.log("Generating Report")
  const pdfPath = path.join(__dirname, 'report.pdf');
  const doc = new PDFDocument();
  doc.pipe(fs.createWriteStream(pdfPath));
@@ -339,6 +340,7 @@ const runAllChecks = async (req, res) => {
 
  await sendEmail(userEmail, subject, text, pdfPath);
 
+ console.log("Email of report sent!!")
  // Delete the PDF after sending
  fs.unlinkSync(pdfPath);
 
