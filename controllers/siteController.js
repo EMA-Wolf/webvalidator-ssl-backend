@@ -5,6 +5,11 @@ const User = require("../models/User")
 const sendEmail = require("../utils/sendEmail")
 const {checkIfLive} = require("../utils/siteCheck")
 
+
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
+
 require("dotenv").config() 
 const request = nvt.makeAPI().setKey(process.env.VIRUSTOTAL_API_KEY) 
 
@@ -13,9 +18,13 @@ const getSslDetails = async (hostname) => await sslChecker(hostname);
 const runSingleCheck = async (req,res) =>{
     const userId = req.body._id
     const domain = req.body.name
+    const userName = req.body.username
+
     // const error = []
     const error = {}
     
+    console.log(`Single scan initated by ${userName}`)
+
     console.time(`Scan time for ${domain}`)
     try{
     console.log(`Processing domain: ${domain}`);
@@ -205,7 +214,9 @@ const runSingleCheck = async (req,res) =>{
 const runAllChecks = async (req, res) => {
   const userId = req.body._id;
   const sites = req.body.sites;
-
+  const userName = req.body.username
+  const userEmail = req.body.email; 
+  
   const results = [];
   const errors = [];
 
@@ -219,6 +230,7 @@ const runAllChecks = async (req, res) => {
     let redirectTo = null;
     let hasMalware = false;
 
+    console.log(`Full scan started by${userName}`)
     try {
       console.log(`Processing domain: ${domain}`);
 
@@ -285,6 +297,52 @@ const runAllChecks = async (req, res) => {
   delete resultsResponse.password;
   console.log(results);
 
+
+ // Generate PDF report
+ const pdfPath = path.join(__dirname, 'report.pdf');
+ const doc = new PDFDocument();
+ doc.pipe(fs.createWriteStream(pdfPath));
+
+ doc.fontSize(18).text('Website Scan Report', { align: 'center' });
+ doc.moveDown();
+ doc.fontSize(14).text(`User: ${userName}`, { align: 'left' });
+ doc.moveDown();
+ doc.fontSize(12).text('Malware Detected Sites:', { underline: true });
+ results.filter(site => site.mal).forEach(site => {
+   doc.text(`- ${site.name}`);
+ });
+
+ doc.moveDown();
+ doc.fontSize(12).text('Errors:', { underline: true });
+ errors.forEach(error => {
+   doc.text(`- ${error.name}: ${error.status}`);
+ });
+
+ doc.moveDown();
+ doc.fontSize(12).text('Successful Scans:', { underline: true });
+ results.filter(site => !site.mal).forEach(site => {
+   doc.text(`- ${site.name}`);
+ });
+
+ doc.end();
+
+ // Wait for the PDF to be written to the file system
+ await new Promise(resolve => {
+   doc.on('finish', resolve);
+ });
+
+ // Send the PDF via email
+ const subject = 'Your Website Scan Report';
+ const text = 'Please find attached your website scan report.';
+
+ await sendEmail(userEmail, subject, text, pdfPath);
+
+ // Delete the PDF after sending
+ fs.unlinkSync(pdfPath);
+
+
+
+
   res.json({ success: resultsResponse, errors });
   console.timeEnd(`Start time`);
 };
@@ -296,6 +354,10 @@ const runAllChecks = async (req, res) => {
 const deleteSite = async (req,res) =>{
   const userId = req.body._id
   const sites = req.body.sites
+  const userName = req.body.username
+
+  console.log(`Deletion request kicked of by ${userName}`)
+
   let  completed = 0
   for(const site of sites){
     try{
