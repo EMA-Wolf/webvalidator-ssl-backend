@@ -302,9 +302,21 @@ const runAllChecks = async (req, res) => {
 
  // Generate PDF report
  console.log("Generating Report")
+
  const pdfPath = path.join(__dirname, 'report.pdf');
  const doc = new PDFDocument();
- doc.pipe(fs.createWriteStream(pdfPath));
+ const buffers = [];
+
+ doc.on('data', buffers.push.bind(buffers));
+ doc.on('end', async () => {
+     const pdfBuffer = Buffer.concat(buffers);
+
+     // Send the PDF via email
+     const subject = 'Your Website Scan Report';
+     const text = 'Please find attached your website scan report.';
+
+     await sendEmail(userEmail, subject, text, pdfBuffer);
+ });
 
  doc.fontSize(18).text('Website Scan Report', { align: 'center' });
  doc.moveDown();
@@ -312,38 +324,22 @@ const runAllChecks = async (req, res) => {
  doc.moveDown();
  doc.fontSize(12).text('Malware Detected Sites:', { underline: true });
  results.filter(site => site.mal).forEach(site => {
-   doc.text(`- ${site.name}`);
+     doc.text(`- ${site.name}`);
  });
 
  doc.moveDown();
  doc.fontSize(12).text('Errors:', { underline: true });
  errors.forEach(error => {
-   doc.text(`- ${error.name}: ${error.status}`);
+     doc.text(`- ${error.name}: ${error.status}`);
  });
 
  doc.moveDown();
  doc.fontSize(12).text('Successful Scans:', { underline: true });
  results.filter(site => !site.mal).forEach(site => {
-   doc.text(`- ${site.name}`);
+     doc.text(`- ${site.name}`);
  });
 
  doc.end();
-
- // Wait for the PDF to be written to the file system
- await new Promise(resolve => {
-   doc.on('finish', resolve);
- });
-
- // Send the PDF via email
- const subject = 'Your Website Scan Report';
- const text = 'Please find attached your website scan report.';
-
- await sendEmail(userEmail, subject, text, pdfPath);
-
- console.log("Email of report sent!!")
- // Delete the PDF after sending
- fs.unlinkSync(pdfPath);
-
 };
 
 

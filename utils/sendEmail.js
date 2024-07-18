@@ -2,14 +2,14 @@ require("dotenv").config()
 const nodemailer = require("nodemailer")
 
 
-const sendEmail = async (to, subject, text,attachmentPath) =>{
+const sendEmail = async (to, subject, text,attachmentContent) =>{
 
     const transporter = nodemailer.createTransport({
         service:"Gmail",
         port:465,
         secure:true,
-        logger:true,
-        debug:true,  
+        // logger:true,
+        // debug:true,  
         secureConnection:false,
         auth:{
             user:process.env.EMAIL,
@@ -27,10 +27,11 @@ const sendEmail = async (to, subject, text,attachmentPath) =>{
         text,
         attachments: [
             {
-              filename: 'report.pdf',
-              path: attachmentPath,
-            },
-          ],
+                filename: 'report.pdf',
+                content: attachmentContent,
+                contentType: 'application/pdf'
+            }
+        ],
     }
 
     try{
