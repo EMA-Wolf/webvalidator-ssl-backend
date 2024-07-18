@@ -230,7 +230,7 @@ const runAllChecks = async (req, res) => {
     let redirectTo = null;
     let hasMalware = false;
 
-    console.log(`Full scan started by${userName}`)
+    console.log(`Full scan started by ${userName}`)
     try {
       console.log(`Processing domain: ${domain}`);
 
@@ -297,7 +297,9 @@ const runAllChecks = async (req, res) => {
   delete resultsResponse.password;
   console.log(results);
 
-
+  res.json({ success: resultsResponse, errors });
+  console.timeEnd(`Start time`);
+  
  // Generate PDF report
  const pdfPath = path.join(__dirname, 'report.pdf');
  const doc = new PDFDocument();
@@ -340,11 +342,6 @@ const runAllChecks = async (req, res) => {
  // Delete the PDF after sending
  fs.unlinkSync(pdfPath);
 
-
-
-
-  res.json({ success: resultsResponse, errors });
-  console.timeEnd(`Start time`);
 };
 
 
