@@ -311,7 +311,7 @@ const runAllChecks = async (req, res) => {
     const pdfPath = path.join(__dirname, 'report.pdf');
 
     try {
-        await generatePDFReport4(userName, results, errors, templatePath, pdfPath);
+        await generatePDFReport3(userName, results, errors, templatePath, pdfPath);
         const pdfBuffer = fs.readFileSync(pdfPath);
 
         // Send the PDF via email
