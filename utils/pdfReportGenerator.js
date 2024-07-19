@@ -4,7 +4,7 @@ const PdfPrinter = require('pdfmake');
 
 const pdf = require('html-pdf');
 const handlebars = require('handlebars');
-
+const puppeteer = require('puppeteer');
 
 const fs = require('fs');
 // const  path = require("path")
@@ -198,9 +198,23 @@ const generatePDFReport3 = async (userName, results, errors, templatePath, outpu
     });
 }
 
+const generatePDFReport4 = async (userName, results, errors, templatePath, outputPath) => {
+    const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
+    const template = handlebars.compile(htmlTemplate);
+    const html = template({ userName, results, errors });
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(html);
+    await page.pdf({ path: outputPath, format: 'A4' });
+
+    await browser.close();
+}
+
 
 module.exports = {
     generatePDFReport,
     generatePDFReport2,
-    generatePDFReport3
+    generatePDFReport3,
+    generatePDFReport4
 }

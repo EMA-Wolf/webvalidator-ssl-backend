@@ -27,6 +27,7 @@
     "pdfkit": "^0.15.0",
     "pdfkit-table": "^0.1.99",
     "pdfmake": "^0.2.10",
+    "puppeteer": "^22.13.1",
     "roboto-font": "^0.1.0",
     "ssl-checker": "^2.0.10",
     "zaproxy": "^2.0.0-rc.5"
