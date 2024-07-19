@@ -4,9 +4,9 @@ const axios = require("axios").create({maxRedirects:10})
 const User = require("../models/User")
 const sendEmail = require("../utils/sendEmail")
 const {checkIfLive} = require("../utils/siteCheck")
+const {generatePDFReport, generatePDFReport2, generatePDFReport3} = require("../utils/pdfReportGenerator")
 
 
-const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
@@ -300,46 +300,127 @@ const runAllChecks = async (req, res) => {
   res.json({ success: resultsResponse, errors });
   console.timeEnd(`Start time`);
 
+
+
  // Generate PDF report
- console.log("Generating Report")
+ console.log("Generating Report");
 
- const pdfPath = path.join(__dirname, 'report.pdf');
- const doc = new PDFDocument();
- const buffers = [];
 
- doc.on('data', buffers.push.bind(buffers));
- doc.on('end', async () => {
-     const pdfBuffer = Buffer.concat(buffers);
 
-     // Send the PDF via email
-     const subject = 'Your Website Scan Report';
-     const text = 'Please find attached your website scan report.';
+ const templatePath = path.join(__dirname, '../utils/assets', 'template.html'); // Path to the HTML template
+    const pdfPath = path.join(__dirname, 'report.pdf');
 
-     await sendEmail(userEmail, subject, text, pdfBuffer);
- });
+    try {
+        await generatePDFReport3(userName, results, errors, templatePath, pdfPath);
+        const pdfBuffer = fs.readFileSync(pdfPath);
 
- doc.fontSize(18).text('Website Scan Report', { align: 'center' });
- doc.moveDown();
- doc.fontSize(14).text(`User: ${userName}`, { align: 'left' });
- doc.moveDown();
- doc.fontSize(12).text('Malware Detected Sites:', { underline: true });
- results.filter(site => site.mal).forEach(site => {
-     doc.text(`- ${site.name}`);
- });
+        // Send the PDF via email
+        const subject = 'Your Website Scan Report';
+        const text = 'Please find attached your website scan report.';
 
- doc.moveDown();
- doc.fontSize(12).text('Errors:', { underline: true });
- errors.forEach(error => {
-     doc.text(`- ${error.name}: ${error.status}`);
- });
+        await sendEmail(userEmail, subject, text, pdfBuffer);
+    } catch (error) {
+        console.error("Error generating PDF report:", error);
+    }
 
- doc.moveDown();
- doc.fontSize(12).text('Successful Scans:', { underline: true });
- results.filter(site => !site.mal).forEach(site => {
-     doc.text(`- ${site.name}`);
- });
 
- doc.end();
+////////////////////////////////////////////////////////////////////////////////////////
+// //  const pdfBuffer = await generatePDFReport(userName, results, errors);
+//  const pdfBuffer = await generatePDFReport2(userName, results, errors);
+
+//  // Send the PDF via email
+//  const subject = 'Your Website Scan Report';
+//  const text = 'Please find attached your website scan report.';
+
+//  await sendEmail(userEmail, subject, text, pdfBuffer);
+///////////////////////////////////////////////////////////////////////////////////
+
+
+
+//  const pdfPath = path.join(__dirname, 'report.pdf');
+//  const doc = new PDFDocument();
+//  const buffers = [];
+
+//  doc.on('data', buffers.push.bind(buffers));
+//  doc.on('end', async () => {
+//    const pdfBuffer = Buffer.concat(buffers);
+
+//    // Send the PDF via email
+//    const subject = 'Your Website Scan Report';
+//    const text = 'Please find attached your website scan report.';
+
+//    await sendEmail(userEmail, subject, text, pdfBuffer);
+
+//    console.log("Email of report sent!!");
+//  });
+
+//  doc.fontSize(18).text('Website Scan Report', { align: 'center' });
+//  doc.moveDown();
+//  doc.fontSize(14).text(`User: ${userName}`, { align: 'left' });
+//  doc.moveDown();
+
+//  // Prepare table data
+//  const tableData = {
+//    headers: ["Malware Detected Sites", "Errors", "Successful Scans"],
+//    rows: [],
+//  };
+
+//  // Define maximum rows count for balanced columns
+//  const maxRows = Math.max(results.filter(site => site.mal).length, errors.length, results.filter(site => !site.mal).length);
+
+//  for (let i = 0; i < maxRows; i++) {
+//    const malSite = results.filter(site => site.mal)[i] || '';
+//    const error = errors[i] ? `${errors[i].name}: ${errors[i].status}` : '';
+//    const successSite = results.filter(site => !site.mal)[i] || '';
+
+//    tableData.rows.push([malSite.name || '', error, successSite.name || '']);
+//  }
+
+//  // Add table to document
+//  doc.table(tableData, {
+//    prepareHeader: () => doc.fontSize(12).font('Helvetica-Bold'),
+//    prepareRow: (row, i) => doc.fontSize(12).font('Helvetica'),
+//  });
+
+//  doc.end();
+
+//  const pdfPath = path.join(__dirname, 'report.pdf');
+//  const doc = new PDFDocument();
+//  const buffers = [];
+
+//  doc.on('data', buffers.push.bind(buffers));
+//  doc.on('end', async () => {
+//      const pdfBuffer = Buffer.concat(buffers);
+
+//      // Send the PDF via email
+//      const subject = 'Your Website Scan Report';
+//      const text = 'Please find attached your website scan report.';
+
+//      await sendEmail(userEmail, subject, text, pdfBuffer);
+//  });
+
+//  doc.fontSize(18).text('Website Scan Report', { align: 'center' });
+//  doc.moveDown();
+//  doc.fontSize(14).text(`User: ${userName}`, { align: 'left' });
+//  doc.moveDown();
+//  doc.fontSize(12).text('Malware Detected Sites:', { underline: true });
+//  results.filter(site => site.mal).forEach(site => {
+//      doc.text(`- ${site.name}`);
+//  });
+
+//  doc.moveDown();
+//  doc.fontSize(12).text('Errors:', { underline: true });
+//  errors.forEach(error => {
+//      doc.text(`- ${error.name}: ${error.status}`);
+//  });
+
+//  doc.moveDown();
+//  doc.fontSize(12).text('Successful Scans:', { underline: true });
+//  results.filter(site => !site.mal).forEach(site => {
+//      doc.text(`- ${site.name}`);
+//  });
+
+//  doc.end();
 };
 
 
