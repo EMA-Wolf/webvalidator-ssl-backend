@@ -189,7 +189,13 @@ const generatePDFReport3 = async (userName, results, errors, templatePath, outpu
     const html = template({ userName, results, errors });
 
     return new Promise((resolve, reject) => {
-        pdf.create(html).toFile(outputPath, (err, res) => {
+        pdf.create(html, {
+            childProcessOptions: {
+                env: {
+                    OPENSSL_CONF: '/dev/null',
+                },
+            },
+        }).toFile(outputPath, (err, res) => {
             if (err) {
                 return reject(err);
             }
