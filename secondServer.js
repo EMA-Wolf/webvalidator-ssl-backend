@@ -30,6 +30,10 @@ app.use("/api/auth",authRoutes)
 app.use("/api/ssl",sslRoutes)
 app.use("/api/scan",scanRoutes)
 
+app.get("/",(req,res)=>{
+    res.json("success")
+})
+
 const PORT = process.env.PORT||3002
 app.listen(PORT,()=>{
     console.log(`Server running at http://localhost:${PORT}`)
