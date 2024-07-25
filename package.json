@@ -4,7 +4,11 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon secondServer.js"
+    "start": "node secondServer.js",
+    "dev": "nodemon secondServer.js",
+    "engines": {
+      "node": ">=14.17.0"
+    }
   },
   "author": "",
   "license": "ISC",
