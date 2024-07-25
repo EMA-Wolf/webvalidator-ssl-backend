@@ -1,4 +1,5 @@
 const {scanWithZAP} = require("../utils/zapUtils")
+const {getWhoisInfo} = require("../utils/whoisUtils");
 
 const scanDomain = async (req,res) =>{
     const { domain } = req.body
@@ -9,11 +10,12 @@ const scanDomain = async (req,res) =>{
 
     console.time(`Scan time`)
     try {
-        const scanResults = await scanWithZAP(domain);
+        // const scanResults = await scanWithZAP(domain);
+        const results = await getWhoisInfo(domain)
         console.timeEnd(`Scan time`);
         console.log(`Completed scan for domain: ${domain}`);
-
-        res.json({ report: scanResults});
+        // res.json({ report: scanResults});
+        res.json({details:results});
     } catch (error) {
         console.timeEnd(`Scan time`);
         console.error(`Error scanning domain: ${domain}`, error.message);
