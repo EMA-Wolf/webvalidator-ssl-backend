@@ -1,15 +1,23 @@
 {
     "version": 2,
     "builds": [
-      {
-        "src": "secondServer.js",
-        "use": "@vercel/node"
-      }
+        {
+            "src": "secondServer.js",
+            "use": "@vercel/node"
+        }
     ],
     "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "secondServer.js"
-      }
+        {
+            "src": "/(.*)",
+            "dest": "secondServer.js",
+            "methods": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS"
+            ]
+        }
     ]
-  }
+}
