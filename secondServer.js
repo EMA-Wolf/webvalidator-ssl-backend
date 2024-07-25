@@ -30,7 +30,7 @@ app.use("/api/auth",authRoutes)
 app.use("/api/ssl",sslRoutes)
 app.use("/api/scan",scanRoutes)
 
-app.get("/",(req,res)=>{
+app.get("/api",(req,res)=>{
     res.json("success")
 })
 
