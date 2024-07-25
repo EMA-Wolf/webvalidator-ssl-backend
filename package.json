@@ -5,10 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node secondServer.js",
-    "dev": "nodemon secondServer.js",
-    "engines": {
-      "node": ">=14.17.0"
-    }
+    "dev": "nodemon secondServer.js"
   },
   "author": "",
   "license": "ISC",

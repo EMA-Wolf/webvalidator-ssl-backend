@@ -1,0 +1,15 @@
+{
+    "vercel":2,
+    "build":[
+        {
+            "src": "./secondServer.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/"
+        }
+    ]
+}
