@@ -21,7 +21,7 @@ const initializeClient = async (email) => {
 const processDomains = (domain) => {
     return domain.split(',')
                  .map(d => d.trim())
-                 .map(d => d.replace(/^https?:\/\//, '').replace(/\/$/, '').replace(/^www\./, ''));
+                 .map(d => d.replace(/^https?:\/\//, '').replace(/\/$/, ''));
 };
 
 const generateCertificate = async(domain,email) =>{
