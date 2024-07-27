@@ -12,7 +12,9 @@ const UserSchema = new mongoose.Schema({
             isLive:{type:Boolean},
             redirectTo:{type:String},
         },
-    ]
+    ],
+    progress:{type:Number},
+    vScanProgress:{type:Number}
 })
 
 module.exports = mongoose.model("User",UserSchema,"User")

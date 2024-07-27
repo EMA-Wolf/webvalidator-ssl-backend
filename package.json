@@ -29,6 +29,7 @@
     "pdfmake": "^0.2.10",
     "puppeteer": "^22.13.1",
     "roboto-font": "^0.1.0",
+    "selenium-webdriver": "^4.23.0",
     "ssl-checker": "^2.0.10",
     "whois": "^2.14.2",
     "zaproxy": "^2.0.0-rc.5"

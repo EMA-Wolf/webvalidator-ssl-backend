@@ -211,7 +211,24 @@ const runSingleCheck = async (req,res) =>{
 //   console.timeEnd(`Start time`)
 // };
 
+const updateProgress = async (userName, progress) => {
+  const user = await User.findOne({username:userName});
+  if (!user) {
+    await User.updateOne(
+      {username: userName },
+      { $set: { "progress": progress } }
+    );
+  } else {
+    await User.updateOne(
+      {username: userName },
+      { $set: { "progress": progress } }
+    );
+  }
+};
+
 const runAllChecks = async (req, res) => {
+
+
   const userId = req.body._id;
   const sites = req.body.sites;
   const userName = req.body.username
@@ -222,7 +239,11 @@ const runAllChecks = async (req, res) => {
 
   console.log(`Full scan started by ${userName}`)
   console.time(`Start time`);
-  
+
+  let completedSites = 0;
+  const totalSites = sites.length;
+  await updateProgress(userName, 0)
+
   // Use Promise.all to run all checks concurrently
   await Promise.all(sites.map(async (site) => {
     const domain = site.name;
@@ -233,6 +254,7 @@ const runAllChecks = async (req, res) => {
 
     try {
       console.log(`Processing domain: ${domain}`);
+    
 
       hasSSL = await getSslDetails(domain);
       const liveCheck = await checkIfLive(domain);
@@ -282,13 +304,16 @@ const runAllChecks = async (req, res) => {
         await User.updateOne(
           { _id: userId },
           { $push: { sites: { name: domain, hasSSL: hasSSL.valid, hasMalware, isLive, redirectTo } } }
-          // { $push: { sites: siteData }  }
         );
       }
     } catch (err) {
       console.error(`Error processing domain ${domain}`, err.message);
       errors.push({ name: domain, status: `Error: ${err.message}` });
     }
+
+    completedSites++;
+    const progress = ((completedSites / totalSites) * 100)
+    await updateProgress(userName,progress);
   }));
 
   console.log(`Done, now printing results to terminal`);
@@ -303,25 +328,25 @@ const runAllChecks = async (req, res) => {
 
 
  // Generate PDF report
- console.log("Generating Report");
+//  console.log("Generating Report");
 
 
 
- const templatePath = path.join(__dirname, '../utils/assets', 'template.html'); // Path to the HTML template
-    const pdfPath = path.join(__dirname, 'report.pdf');
+//  const templatePath = path.join(__dirname, '../utils/assets', 'template.html'); // Path to the HTML template
+//     const pdfPath = path.join(__dirname, 'report.pdf');
 
-    try {
-        await generatePDFReport3(userName, results, errors, templatePath, pdfPath);
-        const pdfBuffer = fs.readFileSync(pdfPath);
+//     try {
+//         await generatePDFReport3(userName, results, errors, templatePath, pdfPath);
+//         const pdfBuffer = fs.readFileSync(pdfPath);
 
-        // Send the PDF via email
-        const subject = 'Your Website Scan Report';
-        const text = 'Please find attached your website scan report.';
+//         // Send the PDF via email
+//         const subject = 'Your Website Scan Report';
+//         const text = 'Please find attached your website scan report.';
 
-        await sendEmail(userEmail, subject, text, pdfBuffer);
-    } catch (error) {
-        console.error("Error generating PDF report:", error);
-    }
+//         await sendEmail(userEmail, subject, text, pdfBuffer);
+//     } catch (error) {
+//         console.error("Error generating PDF report:", error);
+//     }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -423,6 +448,12 @@ const runAllChecks = async (req, res) => {
 //  doc.end();
 };
 
+// New endpoint to get progress
+const getProgress = async (req, res) => {
+  const userName = req.params.userName;
+  const user = await User.findOne({username:userName});
+  res.json({ progress: user.progress });
+}; 
 
 
 
@@ -464,5 +495,6 @@ const deleteSite = async (req,res) =>{
   module.exports ={
     runAllChecks,
     runSingleCheck,
-    deleteSite
+    deleteSite,
+    getProgress
   }
