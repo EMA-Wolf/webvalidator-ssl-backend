@@ -4,7 +4,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon secondServer.js"
+    "start": "nodemon secondServer.js",
+     "postinstall": "node install-drivers.js"
   },
   "author": "",
   "license": "ISC",

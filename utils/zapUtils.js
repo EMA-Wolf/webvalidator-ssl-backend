@@ -1,6 +1,7 @@
 const { Builder, By, until, Capabilities  } = require('selenium-webdriver');
 const ZapClient = require('zaproxy');
 const User = require("../models/User");
+const path = require('path');
 
 require("dotenv").config();
 
@@ -64,6 +65,8 @@ const launchBrowserWithProxy = async (url) => {
         driver = await new Builder()
             .forBrowser('chrome')
             .withCapabilities(capabilities)
+            .setChromeOptions(new (require('selenium-webdriver/chrome').Options)()
+                .setChromeBinaryPath(path.resolve(__dirname, 'chromedriver')))
             .build();
     } catch (e) {
         console.log('Chrome not found, falling back to Firefox');
@@ -80,6 +83,8 @@ const launchBrowserWithProxy = async (url) => {
         driver = await new Builder()
             .forBrowser('firefox')
             .withCapabilities(firefoxCapabilities)
+            .setFirefoxOptions(new (require('selenium-webdriver/firefox').Options)()
+                .setFirefoxBinaryPath(path.resolve(__dirname, 'geckodriver')))
             .build();
     }
 
