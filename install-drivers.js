@@ -64,13 +64,11 @@ const fs = require('fs');
 const https = require('https');
 const path = require('path');
 
-// URLs to download drivers
+// URL to download ChromeDriver
 const chromeDriverUrl = 'https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip';
-const geckoDriverUrl = 'https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz';
 
-// Paths to save the downloaded files
+// Path to save the downloaded file
 const chromeDriverZip = path.join(__dirname, 'chromedriver.zip');
-const geckoDriverTarGz = path.join(__dirname, 'geckodriver.tar.gz');
 
 // Function to download a file
 const downloadFile = (url, dest, callback) => {
@@ -95,16 +93,6 @@ const extractZip = (filePath, destPath, callback) => {
     });
 };
 
-// Function to extract a tar.gz file
-const extractTarGz = (filePath, destPath, callback) => {
-    exec(`tar -xzf ${filePath} -C ${destPath}`, (err) => {
-        if (err) {
-            return callback(err);
-        }
-        fs.unlink(filePath, callback); // Remove tar.gz file after extraction
-    });
-};
-
 // Download and extract ChromeDriver
 downloadFile(chromeDriverUrl, chromeDriverZip, (err) => {
     if (err) {
@@ -120,17 +108,3 @@ downloadFile(chromeDriverUrl, chromeDriverZip, (err) => {
     });
 });
 
-// Download and extract GeckoDriver
-downloadFile(geckoDriverUrl, geckoDriverTarGz, (err) => {
-    if (err) {
-        console.error('Failed to download GeckoDriver:', err);
-        process.exit(1);
-    }
-    extractTarGz(geckoDriverTarGz, __dirname, (err) => {
-        if (err) {
-            console.error('Failed to extract GeckoDriver:', err);
-            process.exit(1);
-        }
-        console.log('GeckoDriver installed successfully');
-    });
-});
