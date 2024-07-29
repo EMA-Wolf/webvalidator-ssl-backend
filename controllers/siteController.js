@@ -20,8 +20,8 @@ const runSingleCheck = async (req,res) =>{
     const domain = req.body.name
     const userName = req.body.username
 
-    // const error = []
-    const error = {}
+    const error = []
+    // const error = {}
     
     console.log(`Single scan initated by ${userName}`)
 
@@ -41,7 +41,8 @@ const runSingleCheck = async (req,res) =>{
     request.domainLookup(domain, async (err, response) => {
         if (err) {
           console.error(`Error looking up domain ${domain} in VirusTotal:`);
-          error[domain] = {status: `Error: ${err}`}
+          // error[domain] = {status: `Error: ${err}`}
+          error.push({name:domain, status:err})
           // error.push({ name: domain, status: `Error: ${err}` });
           // res.status(500).send(`Error looking up domain ${domain} in VirusTotal:`,err.message);
         //   res.json({ ssl: hasSSL.valid, mal: false, live: isLive, redirectTo });
@@ -106,7 +107,8 @@ const runSingleCheck = async (req,res) =>{
     }catch(err){
       console.timeEnd(`Scan time for ${domain}`)
         console.error(`Error processing domain ${domain}`)
-        error[domain] = {status: `Error: ${err.message}`, errorDetails:err}
+        error.push({name:domain, status:err})
+        // error[domain] = {status: `Error: ${err.message}`, errorDetails:err}
         // error.push({ name: domain, status: `Error: ${err.message}` });
         res.json({ resultsResponse:null, error });
         // res.status(500).send(`Error processing domain ${domain}`,err.message);
