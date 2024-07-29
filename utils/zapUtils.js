@@ -116,7 +116,7 @@ const launchBrowserWithProxy = async (url) => {
             .forBrowser('chrome')
             .withCapabilities(capabilities)
             .setChromeOptions(new (require('selenium-webdriver/chrome').Options)()
-                .setBinary(path.resolve(__dirname, '../chromedriver')))
+                .setChromeBinaryPath(path.resolve(__dirname, '../chromedriver')))
             .build();
     } catch (e) {
         console.error('Error launching Chrome with proxy:', e);
