@@ -47,7 +47,13 @@ const vunlerabilityScanDomain = async (req,res) => {
 const getvunlerabilityScanProgress = async (req,res) =>{
         const userName = req.params.userName
         const user = await User.findOne({username:userName});
-        res.json({ progress: user.vScanProgress });
+        if(user.progress === undefined) {
+            res.json({ progress: 0 });
+          }
+          else {
+            res.json({ progress: user.vScanProgress });
+          }
+        // res.json({ progress: user.vScanProgress });
 }
 
 module.exports = {scanDomain ,vunlerabilityScanDomain , getvunlerabilityScanProgress}

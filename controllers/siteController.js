@@ -452,7 +452,14 @@ const runAllChecks = async (req, res) => {
 const getProgress = async (req, res) => {
   const userName = req.params.userName;
   const user = await User.findOne({username:userName});
-  res.json({ progress: user.progress });
+
+  if(user.progress === undefined) {
+    res.json({ progress: 0 });
+  }
+  else {
+    res.json({ progress: user.progress });
+  }
+  // res.json({ progress: user.progress });
 }; 
 
 
