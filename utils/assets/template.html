@@ -86,7 +86,6 @@
 </body>
 </html> -->
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,18 +99,13 @@
             color: #151718;
             padding: 20px;
         }
+
         h1, h2, h3 {
             color: #007bff;
             text-align: center;
         }
-        table {
-            width: 30%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            border: 1px solid #007bff;
-            margin-right: 10px;
-            flex: 1; /* To ensure they take equal space */
-        }
+
+
         th, td {
             padding: 10px;
             border: 1px solid #007bff;
@@ -127,6 +121,13 @@
         .row {
             display: flex;
             gap: 10px;
+        }
+
+        .row > table {
+            width: 30%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            margin-right: 10px;
         }
     </style>
 </head>
