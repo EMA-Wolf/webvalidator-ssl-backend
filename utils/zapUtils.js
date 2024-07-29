@@ -1,4 +1,5 @@
 const { Builder, By, until, Capabilities  } = require('selenium-webdriver');
+const chrome = require('selenium-webdriver/chrome');
 const ZapClient = require('zaproxy');
 const User = require("../models/User");
 const path = require('path');
@@ -111,14 +112,29 @@ const launchBrowserWithProxy = async (url) => {
             sslProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_BASE_PORT}`
         });
 
-   
+      // Path to the ChromeDriver binary in the utils/assets folder
+      const chromeDriverPath = path.resolve(__dirname, 'assets/chromedriver');
+
+      // Chrome options with the custom header
+      const chromeOptions = new chrome.Options();
+      chromeOptions.addArguments('--proxy-server=' + `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_PORT}`);
+      chromeOptions.addArguments('--header=ngrok-skip-browser-warning');
+
+      // Try to launch Chrome with ZAP proxy
+      driver = await new Builder()
+          .forBrowser('chrome')
+          .withCapabilities(capabilities)
+          .setChromeOptions(chromeOptions)
+          .build();
+
+
         // Try to launch Chrome with ZAP proxy
-        driver = await new Builder()
-            .forBrowser('chrome')
-            .withCapabilities(capabilities)
-            .setChromeOptions(new (require('selenium-webdriver/chrome').Options)()
-                .setChromeBinaryPath(path.resolve(__dirname, 'assets/chromedriver')))
-            .build();
+        // driver = await new Builder()
+        //     .forBrowser('chrome')
+        //     .withCapabilities(capabilities)
+        //     .setChromeOptions(new (require('selenium-webdriver/chrome').Options)()
+        //         .setChromeBinaryPath(path.resolve(__dirname, 'assets/chromedriver')))
+        //     .build();
     } catch (e) {
         console.error('Error launching Chrome with proxy:', e);
         throw e;
