@@ -328,25 +328,25 @@ const runAllChecks = async (req, res) => {
 
 
  // Generate PDF report
-//  console.log("Generating Report");
+ console.log("Generating Report");
 
 
 
-//  const templatePath = path.join(__dirname, '../utils/assets', 'template.html'); // Path to the HTML template
-//     const pdfPath = path.join(__dirname, 'report.pdf');
+ const templatePath = path.join(__dirname, '../utils/assets', 'template.html'); // Path to the HTML template
+    const pdfPath = path.join(__dirname, 'report.pdf');
 
-//     try {
-//         await generatePDFReport3(userName, results, errors, templatePath, pdfPath);
-//         const pdfBuffer = fs.readFileSync(pdfPath);
+    try {
+        await generatePDFReport3(userName, results, errors, templatePath, pdfPath);
+        const pdfBuffer = fs.readFileSync(pdfPath);
 
-//         // Send the PDF via email
-//         const subject = 'Your Website Scan Report';
-//         const text = 'Please find attached your website scan report.';
+        // Send the PDF via email
+        const subject = 'Your Website Scan Report';
+        const text = 'Please find attached your website scan report.';
 
-//         await sendEmail(userEmail, subject, text, pdfBuffer);
-//     } catch (error) {
-//         console.error("Error generating PDF report:", error);
-//     }
+        await sendEmail(userEmail, subject, text, pdfBuffer);
+    } catch (error) {
+        console.error("Error generating PDF report:", error);
+    }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
