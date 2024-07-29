@@ -111,13 +111,24 @@ const launchBrowserWithProxy = async (url) => {
             sslProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_BASE_PORT}`
         });
 
-        // Try to launch Chrome with ZAP proxy
-        driver = await new Builder()
-            .forBrowser('chrome')
-            .withCapabilities(capabilities)
-            .setChromeOptions(new (require('selenium-webdriver/chrome').Options)()
-                .setChromeBinaryPath(path.resolve(__dirname, '../chromedriver')))
-            .build();
+          // Chrome options with custom binary path
+          const chromeOptions = new chrome.Options();
+          chromeOptions.setChromeBinaryPath(path.resolve(__dirname, '../chromedriver')); // Set to the actual path of Chrome
+  
+          // Try to launch Chrome with ZAP proxy
+          driver = await new Builder()
+              .forBrowser('chrome')
+              .withCapabilities(capabilities)
+              .setChromeOptions(chromeOptions)
+              .build();
+
+        // // Try to launch Chrome with ZAP proxy
+        // driver = await new Builder()
+        //     .forBrowser('chrome')
+        //     .withCapabilities(capabilities)
+        //     .setChromeOptions(new (require('selenium-webdriver/chrome').Options)()
+        //         .setChromeBinaryPath(path.resolve(__dirname, '../chromedriver')))
+        //     .build();
     } catch (e) {
         console.error('Error launching Chrome with proxy:', e);
         throw e;
@@ -125,6 +136,7 @@ const launchBrowserWithProxy = async (url) => {
 
     try {
         await driver.get(url);
+        console.log(`Opening ${url}`)
         // Wait for the page to load
         await driver.wait(until.elementLocated(By.tagName('body')), 30000); // 30 seconds
 
