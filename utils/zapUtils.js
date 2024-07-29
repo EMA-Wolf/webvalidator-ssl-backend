@@ -50,6 +50,56 @@ const updateProgress = async (userName, progress) => {
     }
   };
 
+// const launchBrowserWithProxy = async (url) => {
+//     let driver;
+//     try {
+//         // Proxy settings for ZAP
+//         const capabilities = Capabilities.chrome();
+//         capabilities.set('proxy', {
+//             proxyType: 'manual',
+//             httpProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_PORT}`,
+//             sslProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_PORT}`
+//         });
+
+//         // Try to launch Chrome with ZAP proxy
+//         driver = await new Builder()
+//             .forBrowser('chrome')
+//             .withCapabilities(capabilities)
+//             .setChromeOptions(new (require('selenium-webdriver/chrome').Options)()
+//                 .setChromeBinaryPath(path.resolve(__dirname, 'chromedriver.zip')))
+//             .build();
+//     } catch (e) {
+//         console.log('Chrome not found, falling back to Firefox');
+
+//         // Proxy settings for ZAP
+//         const firefoxCapabilities = Capabilities.firefox();
+//         firefoxCapabilities.set('proxy', {
+//             proxyType: 'manual',
+//             httpProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_PORT}`,
+//             sslProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_PORT}`
+//         });
+
+//         // Fall back to Firefox with ZAP proxy
+//         driver = await new Builder()
+//             .forBrowser('firefox')
+//             .withCapabilities(firefoxCapabilities)
+//             .setFirefoxOptions(new (require('selenium-webdriver/firefox').Options)()
+//                 .setFirefoxBinaryPath(path.resolve(__dirname, 'geckodriver')))
+//             .build();
+//     }
+
+//     try {
+//         await driver.get(url);
+//         // Wait for the page to load
+//         await driver.wait(until.elementLocated(By.tagName('body')), 30000); // 30 seconds
+
+//     } catch (e) {
+//         console.error('Error during page load:', e);
+//     } 
+
+//     return driver;
+// };
+
 const launchBrowserWithProxy = async (url) => {
     let driver;
     try {
@@ -66,26 +116,11 @@ const launchBrowserWithProxy = async (url) => {
             .forBrowser('chrome')
             .withCapabilities(capabilities)
             .setChromeOptions(new (require('selenium-webdriver/chrome').Options)()
-                .setChromeBinaryPath(path.resolve(__dirname, 'chromedriver.zip')))
+                .setBinary(path.resolve(__dirname, '../chromedriver')))
             .build();
     } catch (e) {
-        console.log('Chrome not found, falling back to Firefox');
-
-        // Proxy settings for ZAP
-        const firefoxCapabilities = Capabilities.firefox();
-        firefoxCapabilities.set('proxy', {
-            proxyType: 'manual',
-            httpProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_PORT}`,
-            sslProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_PORT}`
-        });
-
-        // Fall back to Firefox with ZAP proxy
-        driver = await new Builder()
-            .forBrowser('firefox')
-            .withCapabilities(firefoxCapabilities)
-            .setFirefoxOptions(new (require('selenium-webdriver/firefox').Options)()
-                .setFirefoxBinaryPath(path.resolve(__dirname, 'geckodriver')))
-            .build();
+        console.error('Error launching Chrome with proxy:', e);
+        throw e;
     }
 
     try {
@@ -95,7 +130,7 @@ const launchBrowserWithProxy = async (url) => {
 
     } catch (e) {
         console.error('Error during page load:', e);
-    } 
+    }
 
     return driver;
 };
