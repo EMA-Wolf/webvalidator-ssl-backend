@@ -9,7 +9,7 @@ const zapOptions = {
     apiKey: process.env.ZAP_API_KEY,
     proxy: {
         host: process.env.ZAP_BASE_ADDRESS,
-        port: 8080,
+        port: process.env.ZAP_BASE_PORT,
     },
 };
 
@@ -107,8 +107,8 @@ const launchBrowserWithProxy = async (url) => {
         const capabilities = Capabilities.chrome();
         capabilities.set('proxy', {
             proxyType: 'manual',
-            httpProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_PORT}`,
-            sslProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_PORT}`
+            httpProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_BASE_PORT}`,
+            sslProxy: `${process.env.ZAP_BASE_ADDRESS}:${process.env.ZAP_BASE_PORT}`
         });
 
         // Try to launch Chrome with ZAP proxy
