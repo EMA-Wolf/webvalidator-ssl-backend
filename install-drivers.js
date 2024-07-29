@@ -110,7 +110,6 @@
 
 
 
-
 const { exec } = require('child_process');
 const { get } = require('https');
 const { createWriteStream } = require('fs');
@@ -137,7 +136,9 @@ const downloadChromeDriver = (version) => {
 
 const extractChromeDriver = () => {
     return new Promise((resolve, reject) => {
-        exec('unzip -o chromedriver.zip -d .', (err) => {
+        // Extract chromedriver.zip into the utils/assets folder
+        const outputPath = path.resolve(__dirname, 'utils/assets');
+        exec(`unzip -o chromedriver.zip -d ${outputPath}`, (err) => {
             if (err) {
                 reject(err);
             } else {
@@ -156,3 +157,4 @@ const extractChromeDriver = () => {
         console.error('Failed to download or extract ChromeDriver', error);
     }
 })();
+
