@@ -66,7 +66,7 @@ const launchBrowserWithProxy = async (url) => {
             .forBrowser('chrome')
             .withCapabilities(capabilities)
             .setChromeOptions(new (require('selenium-webdriver/chrome').Options)()
-                .setChromeBinaryPath(path.resolve(__dirname, 'chromedriver')))
+                .setChromeBinaryPath(path.resolve(__dirname, 'chromedriver.zip')))
             .build();
     } catch (e) {
         console.log('Chrome not found, falling back to Firefox');
