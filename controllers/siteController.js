@@ -42,7 +42,7 @@ const runSingleCheck = async (req,res) =>{
         if (err) {
           console.error(`Error looking up domain ${domain} in VirusTotal:`);
           // error[domain] = {status: `Error: ${err}`}
-          error.push({name:domain, status:err})
+          error.push({name:domain, status:err.message})
           // error.push({ name: domain, status: `Error: ${err}` });
           // res.status(500).send(`Error looking up domain ${domain} in VirusTotal:`,err.message);
         //   res.json({ ssl: hasSSL.valid, mal: false, live: isLive, redirectTo });
@@ -107,7 +107,7 @@ const runSingleCheck = async (req,res) =>{
     }catch(err){
       console.timeEnd(`Scan time for ${domain}`)
         console.error(`Error processing domain ${domain}`)
-        error.push({name:domain, status:err})
+        error.push({name:domain, status:err.message})
         // error[domain] = {status: `Error: ${err.message}`, errorDetails:err}
         // error.push({ name: domain, status: `Error: ${err.message}` });
         res.json({ resultsResponse:null, error });
