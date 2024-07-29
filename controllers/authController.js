@@ -68,7 +68,7 @@ const {email, password} = req.body
 
   if(!isMatch){
     console.log(`Incorrect password ${email}`)
-    return res.status(400).send({message:"Invalid password"})
+    return res.status(400).send({message:"Invalid creditentials"})
   }
 
 
