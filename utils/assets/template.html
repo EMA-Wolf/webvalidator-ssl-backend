@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -82,6 +82,252 @@
         {{/each}}
     </table>
 
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Scan Report</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #fff;
+            color: #151718;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #007bff;
+            text-align: center;
+        }
+        table {
+            width: 30%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1px solid #007bff;
+            margin-right: 10px;
+            flex: 1; /* To ensure they take equal space */
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #007bff;
+            text-align: center;
+        }
+        th {
+            background-color: #1a73e8;
+            color: white;
+        }
+        .spacing {
+            margin: 20px 0;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Website Scan Report</h1>
+    <h2>User: {{userName}}</h2>
+
+    <div class="spacing"></div>
+
+    <div class="row">
+        <table>
+            <thead>
+                <tr>
+                    <th>Sites without SSL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each results}}
+                {{#unless ssl}}
+                <tr>
+                    <td>{{name}}</td>
+                </tr>
+                {{/unless}}
+                {{/each}}
+            </tbody>
+        </table>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>Malware Detected Sites</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each results}}
+                {{#if mal}}
+                <tr>
+                    <td>{{name}}</td>
+                </tr>
+                {{/if}}
+                {{/each}}
+            </tbody>
+        </table>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>Sites with Errors</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each errors}}
+                <tr>
+                    <td>{{name}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="spacing"></div>
+
+    <table style="width: 100%;">
+        <thead>
+            <tr>
+                <th>Successfully Scanned Sites</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each results}}
+            {{#if (and ssl (not mal))}}
+            <tr>
+                <td>{{name}}</td>
+            </tr>
+            {{/if}}
+            {{/each}}
+        </tbody>
+    </table>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Scan Report</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #fff;
+            color: #151718;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #007bff;
+            text-align: center;
+        }
+        table {
+            width: 30%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1px solid #007bff;
+            margin-right: 10px;
+            flex: 1; /* To ensure they take equal space */
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #007bff;
+            text-align: center;
+        }
+        th {
+            background-color: #1a73e8;
+            color: white;
+        }
+        .spacing {
+            margin: 20px 0;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Website Scan Report</h1>
+    <h2>User: {{userName}}</h2>
+
+    <div class="spacing"></div>
+
+    <div class="row">
+        <table>
+            <thead>
+                <tr>
+                    <th>Sites without SSL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each results}}
+                {{#unless ssl}}
+                <tr>
+                    <td>{{name}}</td>
+                </tr>
+                {{/unless}}
+                {{/each}}
+            </tbody>
+        </table>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>Malware Detected Sites</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each results}}
+                {{#if mal}}
+                <tr>
+                    <td>{{name}}</td>
+                </tr>
+                {{/if}}
+                {{/each}}
+            </tbody>
+        </table>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>Sites with Errors</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each errors}}
+                <tr>
+                    <td>{{name}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="spacing"></div>
+
+    <table style="width: 100%;">
+        <thead>
+            <tr>
+                <th>Successfully Scanned Sites</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each results}}
+            {{#if (and ssl (not mal))}}
+            <tr>
+                <td>{{name}}</td>
+            </tr>
+            {{/if}}
+            {{/each}}
+        </tbody>
+    </table>
 
 </body>
 </html>
