@@ -88,126 +88,122 @@
 <!-- ------------------------------------------------------------------------------------------------------------- -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Website Scan Report</title>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #fff;
-            color: #151718;
-            padding: 20px;
-        }
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #fff;
+        color: #151718;
+        padding: 20px;
+      }
 
-        h1, h2, h3 {
-            color: #007bff;
-            text-align: center;
-        }
+      h1,
+      h2,
+      h3 {
+        color: #007bff;
+        text-align: center;
+      }
 
-        th, td {
-            padding: 10px;
-            border: 1px solid #007bff;
-            text-align: center;
-        }
-        th {
-            background-color: #1a73e8;
-            color: white;
-        }
-        .spacing {
-            margin: 20px 0;
-        }
-        .row {
-            display: flex;
-        }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #007bff;
+        text-align: center;
+      }
+      th {
+        background-color: #1a73e8;
+        color: white;
+      }
+      .spacing {
+        margin: 20px 0;
+      }
+      .row {
+        display: flex;
+        width: 100%;
+      }
 
-        .row > table {
-            width: 30%;
-            margin-right: 10px;
-        }
+      .row > table {
+        width: 30%;
+        margin-right: 10px;
+      }
 
-        .row > table:last-child {
-            margin-right: 0;
-        }
+      .row > table:last-child {
+        margin-right: 0;
+      }
     </style>
-     <script src="html2canvas.min.js"></script>
-</head>
-<body>
-
+    <script src="html2canvas.min.js"></script>
+  </head>
+  <body>
     <h1>Website Scan Report</h1>
     <h2>User: {{userName}}</h2>
 
     <div class="spacing"></div>
 
     <div class="row">
-        <table>
-            <thead>
-                <tr>
-                    <th>Sites without SSL</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each results}}
-                {{#unless ssl}}
-                <tr>
-                    <td>{{name}}</td>
-                </tr>
-                {{/unless}}
-                {{/each}}
-            </tbody>
-        </table>
+      <table>
+        <thead>
+          <tr>
+            <th>Sites without SSL</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each results}} {{#unless ssl}}
+          <tr>
+            <td>{{name}}</td>
+          </tr>
+          {{/unless}} {{/each}}
+        </tbody>
+      </table>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Malware Detected Sites</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each results}}
-                {{#if mal}}
-                <tr>
-                    <td>{{name}}</td>
-                </tr>
-                {{/if}}
-                {{/each}}
-            </tbody>
-        </table>
+      <table>
+        <thead>
+          <tr>
+            <th>Malware Detected Sites</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each results}} {{#if mal}}
+          <tr>
+            <td>{{name}}</td>
+          </tr>
+          {{/if}} {{/each}}
+        </tbody>
+      </table>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Sites with Errors</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each errors}}
-                <tr>
-                    <td>{{name}}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
+      <table>
+        <thead>
+          <tr>
+            <th>Sites with Errors</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each errors}}
+          <tr>
+            <td>{{name}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
     </div>
 
     <div class="spacing"></div>
 
-    <table style="width: 100%;">
-        <thead>
-            <tr>
-                <th>Successfully Scanned Sites</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each results}}
-            {{#if (and ssl (not mal))}}
-            <tr>
-                <td>{{name}}</td>
-            </tr>
-            {{/if}}
-            {{/each}}
-        </tbody>
+    <table style="width: 100%">
+      <thead>
+        <tr>
+          <th>Successfully Scanned Sites</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each results}} {{#if (and ssl (not mal))}}
+        <tr>
+          <td>{{name}}</td>
+        </tr>
+        {{/if}} {{/each}}
+      </tbody>
     </table>
-
-</body>
+  </body>
 </html>
