@@ -1,5 +1,5 @@
 # Use an official Node runtime as a parent image
-FROM node:16
+FROM node:20
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
@@ -20,11 +20,13 @@ RUN npm install puppeteer
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/src/app/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome
 
 # Add Puppeteer required dependencies
-RUN apt-get update && apt-get install -y wget gnupg && \
-    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+RUN apt-get update && \
+    apt-get install -y wget gnupg && \
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' && \
-    apt-get update && apt-get install -y google-chrome-stable && \
-    apt-get install -y fonts-liberation libappindicator3-1 libasound2 libatk-bridge2.0-0 libcups2 libgbm1 libgtk-3-0 libnspr4 libnss3 libxss1 xdg-utils && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Expose the port the app runs on
