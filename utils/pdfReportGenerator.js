@@ -5,7 +5,7 @@ const PdfPrinter = require('pdfmake');
 const pdf = require('html-pdf');
 const handlebars = require('handlebars');
 const puppeteer = require('puppeteer');
-const { jsPDF } = require('jspdf');
+const  jsPDF  = require('jspdf');
 const html2canvas = require('html2canvas');
 const fs = require('fs');
 
@@ -238,7 +238,7 @@ const generatePDFReportWithJsPDF = async (userName, results, errors, templatePat
 
     // Wait for html2canvas to load
     await page.addScriptTag({ path: path.join(__dirname, 'assets', 'html2canvas.min.js') });
-
+     console.log(page)
     // Generate the PDF using html2canvas and jsPDF
     const pdfBuffer = await page.evaluate(async () => {
         const element = document.body;
