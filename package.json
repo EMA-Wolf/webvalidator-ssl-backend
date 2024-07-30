@@ -7,6 +7,10 @@
     "start": "nodemon secondServer.js",
     "postinstall": "node install-drivers.js"
   },
+  "puppeteer": {
+    "product": "chrome",
+    "executablePath": "/opt/render/.cache/puppeteer/chrome"
+  },
   "author": "",
   "license": "ISC",
   "description": "",

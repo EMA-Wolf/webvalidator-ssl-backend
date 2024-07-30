@@ -7,6 +7,8 @@ const handlebars = require('handlebars');
 const puppeteer = require('puppeteer');
 const { jsPDF } = require('jspdf');
 const fs = require('fs');
+
+require("dotenv").config();
 // const  path = require("path")
 
 //First Pdf maker code using pdfkit
@@ -225,7 +227,11 @@ const generatePDFReportWithJsPDF = async (userName, results, errors, templatePat
     const html = template({ userName, results, errors });
 
     // Launch puppeteer to render HTML content
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: process.env.CHROME_EXECUTABLE_PATH || undefined
+    });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'domcontentloaded' });
 
