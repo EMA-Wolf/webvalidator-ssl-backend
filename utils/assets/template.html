@@ -107,32 +107,59 @@
         text-align: center;
       }
 
-      th,
-      td {
-        padding: 10px;
+      ul {
+        list-style-type: none;
+        padding: 0;
         border: 1px solid #007bff;
+      }
+
+      li {
+        padding: 10px;
+        border-bottom: 1px solid #007bff;
         text-align: center;
       }
-      th {
+
+      li:first-child {
         background-color: #1a73e8;
         color: white;
+        font-weight: bold;
+        border-top: none;
       }
+
+      li:last-child {
+        border-bottom: none;
+      }
+
       .spacing {
         margin: 20px 0;
       }
+
       .row {
         display: flex;
         flex-direction: row;
         width: 100%;
+        border: 1px solid #007bff;
+        border-left: none;
       }
 
-      .row > table {
-        width: 30%;
-        margin-right: 10px;
+      .row > ul {
+        width: 33%;
+        margin: 0;
+        padding: 0;
+        border-left: 1px solid #007bff;
+        border-right: none;
       }
 
-      .row > table:last-child {
-        margin-right: 0;
+      .row > ul:first-child {
+        border-left: none;
+      }
+
+      .row > ul:last-child {
+        border-right: 1px solid #007bff;
+      }
+
+      ul.full-width {
+        width: 100%;
       }
     </style>
     <script src="html2canvas.min.js"></script>
@@ -144,67 +171,41 @@
     <div class="spacing"></div>
 
     <div class="row">
-      <table>
-        <thead>
-          <tr>
-            <th>Sites without SSL</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each results}} {{#unless ssl}}
-          <tr>
-            <td>{{name}}</td>
-          </tr>
-          {{/unless}} {{/each}}
-        </tbody>
-      </table>
+      <ul>
+        <li>Sites without SSL</li>
+        {{#each results}}
+        {{#unless ssl}}
+        <li>{{name}}</li>
+        {{/unless}}
+        {{/each}}
+      </ul>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Malware Detected Sites</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each results}} {{#if mal}}
-          <tr>
-            <td>{{name}}</td>
-          </tr>
-          {{/if}} {{/each}}
-        </tbody>
-      </table>
+      <ul>
+        <li>Malware Detected Sites</li>
+        {{#each results}}
+        {{#if mal}}
+        <li>{{name}}</li>
+        {{/if}}
+        {{/each}}
+      </ul>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Sites with Errors</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each errors}}
-          <tr>
-            <td>{{name}}</td>
-          </tr>
-          {{/each}}
-        </tbody>
-      </table>
+      <ul>
+        <li>Sites with Errors</li>
+        {{#each errors}}
+        <li>{{name}}</li>
+        {{/each}}
+      </ul>
     </div>
 
     <div class="spacing"></div>
 
-    <table style="width: 100%">
-      <thead>
-        <tr>
-          <th>Successfully Scanned Sites</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each results}} {{#if (and ssl (not mal))}}
-        <tr>
-          <td>{{name}}</td>
-        </tr>
-        {{/if}} {{/each}}
-      </tbody>
-    </table>
+    <ul class="full-width">
+      <li>Successfully Scanned Sites</li>
+      {{#each results}}
+      {{#if (and ssl (not mal))}}
+      <li>{{name}}</li>
+      {{/if}}
+      {{/each}}
+    </ul>
   </body>
 </html>
