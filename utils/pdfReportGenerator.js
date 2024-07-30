@@ -10,7 +10,7 @@ const html2canvas = require('html2canvas');
 const fs = require('fs');
 
 require("dotenv").config();
-// const  path = require("path")
+const  path = require("path")
 
 //First Pdf maker code using pdfkit
 const generatePDFReport = (userName, results, errors) => {
