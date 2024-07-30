@@ -4,7 +4,7 @@ const PdfPrinter = require('pdfmake');
 
 const pdf = require('html-pdf');
 const handlebars = require('handlebars');
-// const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer');
 const puppeteerConfig = require('../puppeteerConfiguration');
 const { jsPDF } = require('jspdf');
 const fs = require('fs');
