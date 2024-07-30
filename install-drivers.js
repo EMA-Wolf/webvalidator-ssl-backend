@@ -110,79 +110,52 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// const { exec } = require('child_process');
-// const { get } = require('https');
-// const { createWriteStream } = require('fs');
-// const path = require('path');
-
-// const chromeDriverVersion = '114.0.5735.90'; // Update this version if needed
-
-// const downloadChromeDriver = (version) => {
-//     return new Promise((resolve, reject) => {
-//         const url = `https://chromedriver.storage.googleapis.com/${version}/chromedriver_linux64.zip`;
-//         const file = path.join(__dirname, 'chromedriver.zip');
-//         const fileStream = createWriteStream(file);
-
-//         get(url, (response) => {
-//             response.pipe(fileStream);
-//             fileStream.on('finish', () => {
-//                 fileStream.close(resolve);
-//             });
-//         }).on('error', (err) => {
-//             reject(err);
-//         });
-//     });
-// };
-
-// const extractChromeDriver = () => {
-//     return new Promise((resolve, reject) => {
-//         // Extract chromedriver.zip into the utils/assets folder
-//         const outputPath = path.resolve(__dirname, 'utils/assets');
-//         exec(`unzip -o chromedriver.zip -d ${outputPath}`, (err) => {
-//             if (err) {
-//                 reject(err);
-//             } else {
-//                 resolve();
-//             }
-//         });
-//     });
-// };
-
-// (async () => {
-//     try {
-//         await downloadChromeDriver(chromeDriverVersion);
-//         await extractChromeDriver();
-//         console.log('ChromeDriver downloaded and extracted successfully');
-//     } catch (error) {
-//         console.error('Failed to download or extract ChromeDriver', error);
-//     }
-// })();
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-const fs = require('fs');
+const { exec } = require('child_process');
+const { get } = require('https');
+const { createWriteStream } = require('fs');
 const path = require('path');
-const https = require('https');
 
-const downloadChromium = (url, dest, cb) => {
-    const file = fs.createWriteStream(dest);
-    https.get(url, (response) => {
-        response.pipe(file);
-        file.on('finish', () => {
-            file.close(cb);
+const chromeDriverVersion = '114.0.5735.90'; // Update this version if needed
+
+const downloadChromeDriver = (version) => {
+    return new Promise((resolve, reject) => {
+        const url = `https://chromedriver.storage.googleapis.com/${version}/chromedriver_linux64.zip`;
+        const file = path.join(__dirname, 'chromedriver.zip');
+        const fileStream = createWriteStream(file);
+
+        get(url, (response) => {
+            response.pipe(fileStream);
+            fileStream.on('finish', () => {
+                fileStream.close(resolve);
+            });
+        }).on('error', (err) => {
+            reject(err);
         });
-    }).on('error', (err) => {
-        fs.unlink(dest);
-        if (cb) cb(err.message);
     });
 };
 
-const url = 'https://path.to/chromium';
-const dest = path.resolve(__dirname, 'utils/assets/chromedriver');
+const extractChromeDriver = () => {
+    return new Promise((resolve, reject) => {
+        // Extract chromedriver.zip into the utils/assets folder
+        const outputPath = path.resolve(__dirname, 'utils/assets');
+        exec(`unzip -o chromedriver.zip -d ${outputPath}`, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+};
 
-downloadChromium(url, dest, (err) => {
-    if (err) {
-        console.error('Error downloading Chromium:', err);
-    } else {
-        console.log('Chromium downloaded successfully');
+(async () => {
+    try {
+        await downloadChromeDriver(chromeDriverVersion);
+        await extractChromeDriver();
+        console.log('ChromeDriver downloaded and extracted successfully');
+    } catch (error) {
+        console.error('Failed to download or extract ChromeDriver', error);
     }
-});
+})();
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
