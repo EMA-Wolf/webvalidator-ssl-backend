@@ -6,6 +6,7 @@ const pdf = require('html-pdf');
 const handlebars = require('handlebars');
 const puppeteer = require('puppeteer');
 const { jsPDF } = require('jspdf');
+const html2canvas = require('html2canvas');
 const fs = require('fs');
 
 require("dotenv").config();
