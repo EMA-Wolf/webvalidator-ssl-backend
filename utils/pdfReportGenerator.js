@@ -4,7 +4,8 @@ const PdfPrinter = require('pdfmake');
 
 const pdf = require('html-pdf');
 const handlebars = require('handlebars');
-const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer');
+const puppeteerConfig = require('../puppeteerConfiguration');
 const { jsPDF } = require('jspdf');
 const fs = require('fs');
 
@@ -219,7 +220,6 @@ const generatePDFReport4 = async (userName, results, errors, templatePath, outpu
     await browser.close();
 }
 
-
 const generatePDFReportWithJsPDF = async (userName, results, errors, templatePath, outputPath) => {
     const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
     const template = handlebars.compile(htmlTemplate);
@@ -229,8 +229,9 @@ const generatePDFReportWithJsPDF = async (userName, results, errors, templatePat
     // Launch puppeteer to render HTML content
     const browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-        // executablePath: path.resolve(__dirname, 'utils/assets/chromedriver')
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        // Use custom cache directory if needed
+        ...puppeteerConfig,
     });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'domcontentloaded' });
