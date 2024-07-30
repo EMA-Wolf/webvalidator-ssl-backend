@@ -8,8 +8,7 @@
     "postinstall": "node install-drivers.js"
   },
   "puppeteer": {
-    "product": "chrome",
-    "executablePath": "/opt/render/.cache/puppeteer/chrome"
+    "executablePath": "utils/assets/chromedriver"
   },
   "author": "",
   "license": "ISC",
