@@ -9,7 +9,7 @@ const { jsPDF } = require('jspdf');
 const html2canvas = require('html2canvas');
 const fs = require('fs');
 
-require("dotenv").config();
+// require("dotenv").config();
 // const  path = require("path")
 
 //First Pdf maker code using pdfkit
@@ -230,11 +230,14 @@ const generatePDFReportWithJsPDF = async (userName, results, errors, templatePat
     // Launch puppeteer to render HTML content
     const browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox',"--single-process", "--no-zygote"],
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'domcontentloaded' });
+
+    // Wait for html2canvas to load
+    await page.addScriptTag({ path: path.join(__dirname, 'assets', 'html2canvas.min.js') });
 
     // Generate the PDF using html2canvas and jsPDF
     const pdfBuffer = await page.evaluate(async () => {
