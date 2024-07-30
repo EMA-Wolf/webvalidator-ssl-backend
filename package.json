@@ -7,9 +7,6 @@
     "start": "nodemon secondServer.js",
     "postinstall": "node install-drivers.js"
   },
-  "puppeteer": {
-    "executablePath": "utils/assets/chromedriver"
-  },
   "author": "",
   "license": "ISC",
   "description": "",

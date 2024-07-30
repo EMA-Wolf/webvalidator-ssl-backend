@@ -229,8 +229,8 @@ const generatePDFReportWithJsPDF = async (userName, results, errors, templatePat
     // Launch puppeteer to render HTML content
     const browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        executablePath: path.resolve(__dirname, 'utils/assets/chromedriver')
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        // executablePath: path.resolve(__dirname, 'utils/assets/chromedriver')
     });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'domcontentloaded' });
