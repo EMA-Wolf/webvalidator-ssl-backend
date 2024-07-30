@@ -1,28 +1,23 @@
-# Use an official Node.js runtime as a parent image
-FROM node:14
+# # Use a base image with Java installed
+# FROM owasp/zap2docker-stable
 
-# Set the working directory in the container
-WORKDIR /usr/src
+# # Set environment variables for OWASP ZAP
+# ENV ZAP_PORT=8080
+# ENV ZAP_API_KEY=
 
-# Copy package.json and package-lock.json to the working directory
+# # Expose the ZAP port
+# EXPOSE $ZAP_PORT
+
+# # Run OWASP ZAP in daemon mode with the specified port and API key disabled
+# CMD ["zap.sh", "-daemon", "-port", "8080", "-config", "api.disablekey=true"]
+
+FROM ghcr.io/puppeteer/puppeteer:22.13.1
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = true \ 
+    PUPPETEER_EXECUTABLE_PATH = /usr/bin/google-chrome-stable
+
+WORKDIR /usr/src/app
 COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Bundle app source code inside the Docker image
-COPY . .
-
-# Install additional dependencies for html-pdf
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libssl-dev \
-    libxext-dev \
-    libxrender-dev \
-    libfontconfig1
-
-# Expose port 3000 to the outside world
-EXPOSE 3000
-
-# Command to run the app
+RUN npm ci
+COPY ..
 CMD ["node", "secondServer.js"]
