@@ -5,7 +5,7 @@ const PdfPrinter = require('pdfmake');
 const pdf = require('html-pdf');
 const handlebars = require('handlebars');
 const puppeteer = require('puppeteer');
-
+const { jsPDF } = require('jspdf');
 const fs = require('fs');
 // const  path = require("path")
 
@@ -218,9 +218,46 @@ const generatePDFReport4 = async (userName, results, errors, templatePath, outpu
 }
 
 
+const generatePDFReportWithJsPDF = async (userName, results, errors, templatePath, outputPath) => {
+    const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
+    const template = handlebars.compile(htmlTemplate);
+
+    const html = template({ userName, results, errors });
+
+    // Launch puppeteer to render HTML content
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'domcontentloaded' });
+
+    // Generate the PDF using html2canvas and jsPDF
+    const pdfBuffer = await page.evaluate(async () => {
+        const element = document.body;
+        const canvas = await html2canvas(element);
+        const imgData = canvas.toDataURL('image/png');
+
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'pt',
+            format: 'a4'
+        });
+
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        return pdf.output('arraybuffer');
+    });
+
+    await browser.close();
+
+    fs.writeFileSync(outputPath, Buffer.from(pdfBuffer));
+}
+
 module.exports = {
     generatePDFReport,
     generatePDFReport2,
     generatePDFReport3,
-    generatePDFReport4
+    generatePDFReport4,
+    generatePDFReportWithJsPDF
 }

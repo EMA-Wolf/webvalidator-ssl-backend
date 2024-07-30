@@ -4,7 +4,7 @@ const axios = require("axios").create({maxRedirects:10})
 const User = require("../models/User")
 const sendEmail = require("../utils/sendEmail")
 const {checkIfLive} = require("../utils/siteCheck")
-const {generatePDFReport, generatePDFReport2, generatePDFReport3, generatePDFReport4} = require("../utils/pdfReportGenerator")
+const {generatePDFReport3, generatePDFReportWithJsPDF} = require("../utils/pdfReportGenerator")
 
 
 const fs = require('fs');
@@ -338,7 +338,7 @@ const runAllChecks = async (req, res) => {
     const pdfPath = path.join(__dirname, 'report.pdf');
 
     try {
-        await generatePDFReport3(userName, results, errors, templatePath, pdfPath);
+        await generatePDFReportWithJsPDF(userName, results, errors, templatePath, pdfPath);
         const pdfBuffer = fs.readFileSync(pdfPath);
 
         // Send the PDF via email
