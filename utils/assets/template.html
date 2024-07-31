@@ -86,7 +86,7 @@
 </body>
 </html> -->
 <!-- ------------------------------------------------------------------------------------------------------------- -->
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -212,4 +212,158 @@
       {{/each}}
     </ul>
   </body>
+</html> -->
+<!-- ----------------------------------------------------------------------------------------- -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <style>
+    body {
+      font-family: "Roboto", sans-serif;
+      background-color: #fff;
+      color: #151718;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #007bff;
+      text-align: center;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      border: 1px solid #007bff;
+    }
+    li {
+    text-align: center;
+      border-bottom: 1px solid #007bff;
+    }
+    li:first-child {
+      background-color: #1a73e8;
+      color: white;
+      font-weight: bold;
+      border-top: none;
+    }
+    li:last-child {
+      border-bottom: none;
+    }
+    .spacing {
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>{{title}}</h1>
+  <h2>User: {{userName}}</h2>
+  <div class="spacing"></div>
+  <ul>
+    <li>{{header}}</li>
+    {{#each items}}
+    <li>{{this}}</li>
+    {{/each}}
+  </ul>
+</body>
+</html> -->
+
+<!-- -------------------------------------------- -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Website Scan Report</title>
+  <style>
+    body {
+      font-family: "Roboto", sans-serif;
+      background-color: #fff;
+      color: #151718;
+      padding: 20px;
+    }
+
+    h1, h2, h3 {
+      color: #007bff;
+      text-align: center;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      border: 1px solid #007bff;
+      margin-bottom: 20px;
+    }
+
+    li {
+      border-bottom: 1px solid #007bff;
+      padding: 10px;
+      text-align: center;
+    }
+
+    li:first-child {
+      background-color: #1a73e8;
+      color: white;
+      font-weight: bold;
+      border-top: none;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    .spacing {
+      margin: 20px 0;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+
+    ul.full-width {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Website Scan Report</h1>
+  <h2>User: {{userName}}</h2>
+
+  <div class="spacing"></div>
+
+  {{#if sslResults.shouldDisplay}}
+    <ul class="{{#if sslResults.needsPageBreak}}page-break{{/if}}">
+      <li>Sites without SSL</li>
+      {{#each sslResults.data}}
+        <li>{{name}}</li>
+      {{/each}}
+    </ul>
+  {{/if}}
+
+  {{#if malResults.shouldDisplay}}
+    <ul class="{{#if malResults.needsPageBreak}}page-break{{/if}}">
+      <li>Malware Detected Sites</li>
+      {{#each malResults.data}}
+        <li>{{name}}</li>
+      {{/each}}
+    </ul>
+  {{/if}}
+
+  {{#if errors.shouldDisplay}}
+    <ul class="{{#if errors.needsPageBreak}}page-break{{/if}}">
+      <li>Sites with Errors</li>
+      {{#each errors.data}}
+        <li>{{name}}</li>
+      {{/each}}
+    </ul>
+  {{/if}}
+
+  {{#if successfulResults.shouldDisplay}}
+    <ul class="full-width">
+      <li>Successfully Scanned Sites</li>
+      {{#each successfulResults.data}}
+        <li>{{name}}</li>
+      {{/each}}
+    </ul>
+  {{/if}}
+</body>
 </html>

@@ -179,35 +179,67 @@ const generatePDFReport2 = async (userName, results, errors, outputPath = 'repor
 
 handlebars.registerHelper('not', function (value) {
     return !value;
-});
-
-handlebars.registerHelper('and', function (a, b) {
+  });
+  
+  handlebars.registerHelper('and', function (a, b) {
     return a && b;
-});
+  });
+  
+  handlebars.registerHelper('length', function (context) {
+    return context.length;
+  });
+  
+  handlebars.registerHelper('gt', function (value, threshold) {
+    return value > threshold;
+  });
 
-const generatePDFReport3 = async (userName, results, errors, templatePath, outputPath) => {
+// const generatePDFReport3 = async (userName, results, errors, templatePath, outputPath) => {
+//     const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
+//     const template = handlebars.compile(htmlTemplate);
+
+//     const html = template({ userName, results, errors });
+
+//     return new Promise((resolve, reject) => {
+//         pdf.create(html, {
+//             format: 'A4',
+//             childProcessOptions: {
+//                 env: {
+//                     OPENSSL_CONF: '/dev/null',
+//                 },
+//             },
+//         }).toFile(outputPath, (err, res) => {
+//             if (err) {
+//                 return reject(err);
+//             }
+//             resolve(res.filename);
+//         });
+//     });
+// }
+
+const generatePDFReport3 = async (userName, processedResults, templatePath, outputPath) => {
     const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
     const template = handlebars.compile(htmlTemplate);
-
-    const html = template({ userName, results, errors });
-
+  
+    const html = template({ userName, ...processedResults });
+  
     return new Promise((resolve, reject) => {
-        pdf.create(html, {
-            format: 'A3',
-            orientation: 'landscape',
-            childProcessOptions: {
-                env: {
-                    OPENSSL_CONF: '/dev/null',
-                },
-            },
-        }).toFile(outputPath, (err, res) => {
-            if (err) {
-                return reject(err);
-            }
-            resolve(res.filename);
-        });
+      pdf.create(html, {
+        format: 'A4',
+        orientation: 'portrait',
+        childProcessOptions: {
+          env: {
+            OPENSSL_CONF: '/dev/null',
+          },
+        },
+      }).toFile(outputPath, (err, res) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(res.filename);
+      });
     });
-}
+  };
+  
 
 const generatePDFReport4 = async (userName, results, errors, templatePath, outputPath) => {
     const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
@@ -266,10 +298,37 @@ const generatePDFReportWithJsPDF = async (userName, results, errors, templatePat
     fs.writeFileSync(outputPath, Buffer.from(pdfBuffer));
 }
 
+
+const createPdf = (html, outputPath) => {
+    return new Promise((resolve, reject) => {
+      pdf.create(html, {
+        format: 'A4',
+        childProcessOptions: {
+          env: {
+            OPENSSL_CONF: '/dev/null',
+          },
+        },
+      }).toFile(outputPath, (err, res) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(res.filename);
+      });
+    });
+  };
+  
+  const generateHtml = (templatePath, data) => {
+    const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
+    const template = handlebars.compile(htmlTemplate);
+    return template(data);
+  };
+
 module.exports = {
     generatePDFReport,
     generatePDFReport2,
     generatePDFReport3,
     generatePDFReport4,
-    generatePDFReportWithJsPDF
+    generatePDFReportWithJsPDF,
+    createPdf,
+    generateHtml,
 }

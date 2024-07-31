@@ -4,9 +4,12 @@ const axios = require("axios").create({ maxRedirects: 10 });
 const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
 const { checkIfLive } = require("../utils/siteCheck");
+
 const {
   generatePDFReport3,
   generatePDFReportWithJsPDF,
+  createPdf,
+  generateHtml
 } = require("../utils/pdfReportGenerator");
 
 const fs = require("fs");
@@ -224,6 +227,9 @@ const updateProgress = async (userName, progress) => {
   }
 };
 
+
+
+
 const runAllChecks = async (req, res) => {
   const userId = req.body._id;
   const sites = req.body.sites;
@@ -339,16 +345,42 @@ const runAllChecks = async (req, res) => {
   console.timeEnd(`Start time`);
 
   // Generate PDF report
+  
+  const sslResults = results.filter(r => !r.ssl);
+  const malResults = results.filter(r => r.mal);
+  const successfulResults = results.filter(r => r.ssl && !r.mal);
+  
+  // Add display and page break flags
+  const processedResults = {
+    sslResults: {
+      data: sslResults,
+      shouldDisplay: sslResults.length > 0,
+      needsPageBreak: sslResults.length > 4,
+    },
+    malResults: {
+      data: malResults,
+      shouldDisplay: malResults.length > 0,
+      needsPageBreak: malResults.length > 4,
+    },
+    errors: {
+      data: errors,
+      shouldDisplay: errors.length > 0,
+      needsPageBreak: errors.length > 4,
+    },
+    successfulResults: {
+      data: successfulResults,
+      shouldDisplay: successfulResults.length > 0,
+    }
+  };
   console.log("Generating Report");
 
   const templatePath = path.join(__dirname, "../utils/assets", "template.html"); // Path to the HTML template
-  const pdfPath = path.join(__dirname, "report.pdf");
+  const pdfPath = path.join(__dirname, "../utils/assets", "report.pdf");
 
   try {
     await generatePDFReport3(
       userName,
-      results,
-      errors,
+      processedResults,
       templatePath,
       pdfPath
     );
@@ -362,7 +394,29 @@ const runAllChecks = async (req, res) => {
   } catch (error) {
     console.error("Error generating PDF report:", error);
   }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // const templatePath = path.join(__dirname, "../utils/assets", "template.html"); // Path to the HTML template
+  // const pdfPath = path.join(__dirname, "report.pdf");
 
+  // try {
+  //   await generatePDFReport3(
+  //     userName,
+  //     results,
+  //     errors,
+  //     templatePath,
+  //     pdfPath
+  //   );
+  //   const pdfBuffer = fs.readFileSync(pdfPath);
+
+  //   // Send the PDF via email
+  //   const subject = "Your Website Scan Report";
+  //   const text = "Please find attached your website scan report.";
+
+  //   await sendEmail(userEmail, subject, text, pdfBuffer);
+  // } catch (error) {
+  //   console.error("Error generating PDF report:", error);
+  // }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   
 
