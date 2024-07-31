@@ -132,7 +132,7 @@
         margin: 20px 0;
       }
 
-      .row {
+      #row {
         display: flex;
         width: 100%;
         border: 1px solid #007bff;
@@ -141,22 +141,23 @@
         border-bottom: none;
       }
 
-      .row > ul {
+      #row > ul {
+        width: 19%;
         margin: 0;
         padding: 0;
         border-left: 1px solid #007bff;
         border-right: 1px solid #007bff;
       }
 
-      .row > li {
-        width: 33%;
+      #row >ul li {
+        text-align: center;
       }
 
-      .row > ul:first-child {
+      #row > ul:first-child {
         border-left: none;
       }
 
-      .row > ul:last-child {
+      #row > ul:last-child {
         border-right: 1px solid #007bff;
       }
 
@@ -172,7 +173,7 @@
 
     <div class="spacing"></div>
 
-    <div class="row">
+    <div id="row">
       <ul>
         <li>Sites without SSL</li>
         {{#each results}}
