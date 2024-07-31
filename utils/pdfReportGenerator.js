@@ -193,6 +193,8 @@ const generatePDFReport3 = async (userName, results, errors, templatePath, outpu
 
     return new Promise((resolve, reject) => {
         pdf.create(html, {
+            format: 'A4',
+            orientation: 'landscape',
             childProcessOptions: {
                 env: {
                     OPENSSL_CONF: '/dev/null',
