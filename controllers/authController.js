@@ -164,10 +164,14 @@ const requestPasswordReset = async (req, res) => {
       return res.status(200).json({ message: 'User with this email does not exist' });
     }
 
-    // Generate reset token
+    // Invalidate any existing reset token by setting them to undefined
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    // Generate new reset token
     const resetToken = crypto.randomBytes(20).toString('hex');
 
-    // Set token and expiration
+    // Set new token and expiration
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
@@ -189,8 +193,29 @@ const requestPasswordReset = async (req, res) => {
 };
 
 // Render the reset password form
-const renderResetPasswordForm = (req, res) => {
-  res.render('resetPassword', { token: req.params.token });
+// const renderResetPasswordForm = (req, res) => {
+//   res.render('resetPassword', { token: req.params.token });
+// };
+
+// Render the reset password form
+const renderResetPasswordForm = async (req, res) => {
+  const { token } = req.params;
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).send('Invalid or expired token');
+    }
+
+    res.render('resetPassword', { token });
+  } catch (err) {
+    console.error(`Error rendering reset password form: ${err.message}`);
+    res.status(500).send('Server error');
+  }
 };
 
 // Reset Password
