@@ -39,4 +39,4 @@ const extractAltNamesFromError = (errorMessage) => {
     }
   };
 
-  module.exports = {checkIfLive, extractAltNamesFromError}
+  module.exports = {checkIfLive}
